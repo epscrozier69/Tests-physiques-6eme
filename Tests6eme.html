@@ -835,20 +835,23 @@ function renderLegerPanel(className, cls, students){
     <div class="inline-form">
       ${leger.running ? `<button class="btn btn-outline" style="color:#1e293b;background:#e2e8f0;" id="btnStopLeger" data-class="${escapeAttr(className)}">⏸️ Arrêter le test</button>` : ''}
     </div>
-    <h3 style="margin-top:16px;">Élèves du groupe ${leger.activeGroup} — cliquer pour enregistrer l'arrêt</h3>
+    <h3 style="margin-top:16px;">Groupe actif : ${leger.activeGroup} — cliquer sur un élève de ce groupe pour enregistrer l'arrêt</h3>
     <div class="student-grid">
       ${(()=>{
         const legerRanks = buildTestRanking(students, 'leger');
-        return students.filter(s=>s.groupe===leger.activeGroup).map(s=>{
+        return students.map(s=>{
           const r = s.results.leger;
           if(r && r.absent){
-            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Absent</span></div>`;
+            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · Absent</span></div>`;
           }
           if(r && r.done){
             const niv = niveauLeger(r.palier);
-            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)} <span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>${rankSuffix(legerRanks, s)}</span></div>`;
+            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)} <span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>${rankSuffix(legerRanks, s)}</span></div>`;
           }
-          return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
+          if(s.groupe===leger.activeGroup){
+            return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
+          }
+          return `<div class="student-tile" style="opacity:.55;">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · en attente</span></div>`;
         }).join('');
       })()}
     </div>`;
@@ -1111,7 +1114,9 @@ function buildTestRanking(students, testKey){
   let ranked;
   if(testKey==='leger'){
     ranked = students.filter(s=>s.results.leger && !s.results.leger.absent)
-      .sort((a,b)=> b.results.leger.palier - a.results.leger.palier || b.results.leger.vitesse - a.results.leger.vitesse);
+      .sort((a,b)=> b.results.leger.palier - a.results.leger.palier
+        || b.results.leger.vitesse - a.results.leger.vitesse
+        || b.results.leger.temps - a.results.leger.temps);
   }else if(testKey==='longueur'){
     ranked = students.filter(s=>s.results.longueur && !s.results.longueur.absent)
       .sort((a,b)=> b.results.longueur.distance - a.results.longueur.distance);
