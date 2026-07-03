@@ -185,8 +185,6 @@ table.data-table th{
   cursor:default;
   white-space:nowrap;
 }
-table.data-table th.sortable{cursor:pointer;}
-table.data-table th.sortable:hover{filter:brightness(1.1);}
 table.data-table td{
   padding:5px 8px;
   border-bottom:1px solid var(--border);
@@ -410,7 +408,6 @@ let state = {
   activeTab: 'general' // 'general' | 'results' | className
 };
 
-let sortState = { col: 'nomPrenom', dir: 1 };
 let resultsClassFilter = 'all';
 let vitesseTimerHandle = null;
 let legerTimerHandle = null;
@@ -677,7 +674,7 @@ function renderTabs(){
     html += `<button data-tab="${escapeAttr(cn)}" class="${state.activeTab===cn?'active':''}">🏷️ ${escapeHtml(cn)}</button>`;
   });
   if(state.classOrder.length){
-    html += `<button data-tab="results" class="tab-results ${state.activeTab==='results'?'active':''}">📊 Résultats</button>`;
+    html += `<button data-tab="results" class="tab-results ${state.activeTab==='results'?'active':''}">📊 Statistiques</button>`;
   }
   nav.innerHTML = html;
   nav.querySelectorAll('button').forEach(btn=>{
@@ -840,16 +837,20 @@ function renderLegerPanel(className, cls, students){
     </div>
     <h3 style="margin-top:16px;">Élèves du groupe ${leger.activeGroup} — cliquer pour enregistrer l'arrêt</h3>
     <div class="student-grid">
-      ${students.filter(s=>s.groupe===leger.activeGroup).map(s=>{
-        const r = s.results.leger;
-        if(r && r.absent){
-          return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Absent</span></div>`;
-        }
-        if(r && r.done){
-          return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)}</span></div>`;
-        }
-        return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
-      }).join('')}
+      ${(()=>{
+        const legerRanks = buildTestRanking(students, 'leger');
+        return students.filter(s=>s.groupe===leger.activeGroup).map(s=>{
+          const r = s.results.leger;
+          if(r && r.absent){
+            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Absent</span></div>`;
+          }
+          if(r && r.done){
+            const niv = niveauLeger(r.palier);
+            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)} <span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>${rankSuffix(legerRanks, s)}</span></div>`;
+          }
+          return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
+        }).join('');
+      })()}
     </div>`;
   }
 
@@ -958,10 +959,11 @@ function renderLongueurPanel(className, cls, students){
     currentBlock = `<div class="empty-state"><span class="big-icon">✅</span><p>Tous les élèves ont été testés.</p></div>`;
   }
 
-  const longueurFormat = (r)=> `${r.distance} cm <span class="badge badge-${niveauLongueur(r.distance)}">${LEVEL_LABEL[niveauLongueur(r.distance)]}</span>`;
+  const longueurRanks = buildTestRanking(students, 'longueur');
+  const longueurFormat = (r, s)=> `${r.distance} cm <span class="badge badge-${niveauLongueur(r.distance)}">${LEVEL_LABEL[niveauLongueur(r.distance)]}</span>${rankSuffix(longueurRanks, s)}`;
   const rows = students.map(s=>{
     const r = s.results.longueur;
-    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : longueurFormat(r);
+    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : longueurFormat(r, s);
     const nameCell = `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="longueur" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`;
     return `<tr>${nameCell}<td>${resultHtml}</td></tr>`;
   }).join('');
@@ -1030,10 +1032,11 @@ function renderVitessePanel(className, cls, students){
     currentBlock = `<div class="empty-state"><span class="big-icon">✅</span><p>Tous les élèves ont été testés.</p></div>`;
   }
 
-  const vitesseFormat = (r)=> `${r.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(r.temps)}">${LEVEL_LABEL[niveauVitesse(r.temps)]}</span>`;
+  const vitesseRanks = buildTestRanking(students, 'vitesse');
+  const vitesseFormat = (r, s)=> `${r.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(r.temps)}">${LEVEL_LABEL[niveauVitesse(r.temps)]}</span>${rankSuffix(vitesseRanks, s)}`;
   const rows = students.map(s=>{
     const r = s.results.vitesse;
-    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : vitesseFormat(r);
+    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : vitesseFormat(r, s);
     const clickable = !vit.running;
     const nameCell = clickable
       ? `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="vitesse" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`
@@ -1099,9 +1102,24 @@ function rankSuffix(rankInfo, s){
   const g = rankInfo.general.get(s.id);
   const sx = rankInfo.bySex.get(s.id);
   if(!g) return '';
-  const medal = MEDALS[g] ? MEDALS[g]+' ' : '';
-  const podiumStyle = MEDALS[g] ? 'font-weight:700;' : '';
-  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;${podiumStyle}">${medal}${ordinal(g)} général · ${ordinal(sx)} ${sexLabelPlural(s.sexe)}</span>`;
+  const gMedal = MEDALS[g] ? MEDALS[g]+' ' : '';
+  const sxMedal = MEDALS[sx] ? MEDALS[sx]+' ' : '';
+  const podiumStyle = (MEDALS[g]||MEDALS[sx]) ? 'font-weight:700;' : '';
+  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;${podiumStyle}">${gMedal}${ordinal(g)} général · ${sxMedal}${ordinal(sx)} ${sexLabelPlural(s.sexe)}</span>`;
+}
+function buildTestRanking(students, testKey){
+  let ranked;
+  if(testKey==='leger'){
+    ranked = students.filter(s=>s.results.leger && !s.results.leger.absent)
+      .sort((a,b)=> b.results.leger.palier - a.results.leger.palier || b.results.leger.vitesse - a.results.leger.vitesse);
+  }else if(testKey==='longueur'){
+    ranked = students.filter(s=>s.results.longueur && !s.results.longueur.absent)
+      .sort((a,b)=> b.results.longueur.distance - a.results.longueur.distance);
+  }else{
+    ranked = students.filter(s=>s.results.vitesse && !s.results.vitesse.absent)
+      .sort((a,b)=> a.results.vitesse.temps - b.results.vitesse.temps);
+  }
+  return buildRankInfo(ranked);
 }
 
 function statTable(title, data){
@@ -1126,92 +1144,21 @@ function statTable(title, data){
   </div>`;
 }
 
-function sortComparator(col){
-  const dir = sortState.dir;
-  return (a,b)=>{
-    let av, bv;
-    switch(col){
-      case 'nomPrenom': av=normalize(a.nomPrenom); bv=normalize(b.nomPrenom); break;
-      case 'classe': av=normalize(a.classe); bv=normalize(b.classe); break;
-      case 'sexe': av=a.sexe; bv=b.sexe; break;
-      case 'leger': av = a.results.leger && !a.results.leger.absent ? a.results.leger.palier : -1;
-                    bv = b.results.leger && !b.results.leger.absent ? b.results.leger.palier : -1; break;
-      case 'longueur': av = a.results.longueur && !a.results.longueur.absent ? a.results.longueur.distance : -1;
-                        bv = b.results.longueur && !b.results.longueur.absent ? b.results.longueur.distance : -1; break;
-      case 'vitesse': av = a.results.vitesse && !a.results.vitesse.absent ? -a.results.vitesse.temps : -9999;
-                       bv = b.results.vitesse && !b.results.vitesse.absent ? -b.results.vitesse.temps : -9999; break;
-      default: av=''; bv='';
-    }
-    if(av<bv) return -1*dir;
-    if(av>bv) return 1*dir;
-    return 0;
-  };
-}
-
 function renderResultsTab(){
   const baseStudents = resultsClassFilter==='all' ? allStudentsFlat() : allStudentsFlat().filter(s=>s.classe===resultsClassFilter);
-  const students = [...baseStudents].sort(sortComparator(sortState.col));
   const stats = computeStats(baseStudents);
 
   const classFilterOptions = `<option value="all" ${resultsClassFilter==='all'?'selected':''}>Toutes les classes</option>` +
     state.classOrder.map(cn=>`<option value="${escapeAttr(cn)}" ${resultsClassFilter===cn?'selected':''}>${escapeHtml(cn)}</option>`).join('');
 
-  const cols = [
-    {key:'nomPrenom', label:'Nom Prénom'},
-    {key:'classe', label:'Classe'},
-    {key:'sexe', label:'Sexe'},
-    {key:'leger', label:'Luc Léger'},
-    {key:'longueur', label:'Longueur'},
-    {key:'vitesse', label:'Vitesse'}
-  ];
-
-  const legerRanking = baseStudents.filter(s=>s.results.leger && !s.results.leger.absent)
-    .sort((a,b)=> b.results.leger.palier - a.results.leger.palier || b.results.leger.vitesse - a.results.leger.vitesse);
-  const longueurRanking = baseStudents.filter(s=>s.results.longueur && !s.results.longueur.absent)
-    .sort((a,b)=> b.results.longueur.distance - a.results.longueur.distance);
-  const vitesseRanking = baseStudents.filter(s=>s.results.vitesse && !s.results.vitesse.absent)
-    .sort((a,b)=> a.results.vitesse.temps - b.results.vitesse.temps);
-  const legerRanks = buildRankInfo(legerRanking);
-  const longueurRanks = buildRankInfo(longueurRanking);
-  const vitesseRanks = buildRankInfo(vitesseRanking);
-
-  const rows = students.map(s=>{
-    const l = s.results.leger, j = s.results.longueur, v = s.results.vitesse;
-    const legerCell = !l ? '<span class="muted">—</span>' : l.absent ? '<span class="badge badge-abs">Absent</span>' :
-      `Palier ${l.palier} · ${l.vitesse.toFixed(1)}km/h <span class="badge badge-${niveauLeger(l.palier)}">${LEVEL_LABEL[niveauLeger(l.palier)]}</span>${rankSuffix(legerRanks, s)}`;
-    const longCell = !j ? '<span class="muted">—</span>' : j.absent ? '<span class="badge badge-abs">Absent</span>' :
-      `${j.distance} cm <span class="badge badge-${niveauLongueur(j.distance)}">${LEVEL_LABEL[niveauLongueur(j.distance)]}</span>${rankSuffix(longueurRanks, s)}`;
-    const vitCell = !v ? '<span class="muted">—</span>' : v.absent ? '<span class="badge badge-abs">Absent</span>' :
-      `${v.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(v.temps)}">${LEVEL_LABEL[niveauVitesse(v.temps)]}</span>${rankSuffix(vitesseRanks, s)}`;
-    return `<tr>
-      <td>${escapeHtml(fullName(s))}</td><td>${escapeHtml(s.classe)}</td>
-      <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
-      <td>${legerCell}</td><td>${longCell}</td><td>${vitCell}</td>
-    </tr>`;
-  }).join('');
-
-  const thead = cols.map((c,i)=>{
-    const arrow = sortState.col===c.key ? (sortState.dir===1?' ▲':' ▼') : '';
-    return `<th class="sortable" data-sort="${c.key}" style="background:${HEADER_COLORS[i%HEADER_COLORS.length]}">${c.label}${arrow}</th>`;
-  }).join('');
-
   return `
   <div class="card">
-    <h2>📊 Résultats${resultsClassFilter==='all' ? ' — toutes classes' : ' — '+escapeHtml(resultsClassFilter)}</h2>
+    <h2>📊 Statistiques${resultsClassFilter==='all' ? ' — toutes classes' : ' — '+escapeHtml(resultsClassFilter)}</h2>
     <div class="pill-row">
       <label>Filtrer par classe :
         <select id="resultsClassFilterSelect">${classFilterOptions}</select>
       </label>
     </div>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead><tr>${thead}</tr></thead>
-        <tbody>${rows || '<tr><td colspan="6" class="muted">Aucun résultat enregistré.</td></tr>'}</tbody>
-      </table>
-    </div>
-  </div>
-  <div class="card">
-    <h2>Statistiques</h2>
     <div class="grid-2">
       ${statTable('🏃 Luc Léger', stats.leger)}
       ${statTable('🦘 Longueur', stats.longueur)}
@@ -1392,15 +1339,6 @@ function attachDynamicHandlers(){
     });
   }
 
-  // Tri du tableau résultats
-  document.querySelectorAll('th.sortable').forEach(th=>{
-    th.addEventListener('click', ()=>{
-      const col = th.dataset.sort;
-      if(sortState.col === col) sortState.dir *= -1;
-      else { sortState.col = col; sortState.dir = 1; }
-      renderAll();
-    });
-  });
 
 }
 
