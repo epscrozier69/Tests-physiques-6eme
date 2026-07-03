@@ -447,8 +447,8 @@ function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9
 
 function sortStudentsAlpha(students){
   return [...students].sort((a,b)=>{
-    const an = normalize(a.nom)+normalize(a.prenom);
-    const bn = normalize(b.nom)+normalize(b.prenom);
+    const an = normalize(a.nomPrenom);
+    const bn = normalize(b.nomPrenom);
     return an.localeCompare(bn);
   });
 }
@@ -549,28 +549,39 @@ function handleClassImportFile(e, className){
         e.target.value=''; return;
       }
       const keys = Object.keys(allRows[0].row);
-      const keyNom = keys.find(k=> normalize(k).includes('nom') && !normalize(k).includes('prenom'));
-      const keyPrenom = keys.find(k=> normalize(k).includes('prenom'));
+      // Colonne unique "Nom Prénom" déjà fusionnée, sinon deux colonnes séparées.
+      const keyMerged = keys.find(k=>{
+        const n = normalize(k);
+        return n.includes('nom') && n.includes('prenom');
+      });
+      const keyNomOnly = keys.find(k=> normalize(k).includes('nom') && !normalize(k).includes('prenom'));
+      const keyPrenomOnly = keys.find(k=> normalize(k).includes('prenom'));
       const keySexe = keys.find(k=> normalize(k).includes('sexe') || normalize(k).includes('genre'));
       const keyClasse = keys.find(k=> normalize(k).includes('classe'));
-      if(!keyNom && !keyPrenom){
-        alert("Colonnes 'Nom' et 'Prénom' introuvables dans le fichier.");
+      if(!keyMerged && !keyNomOnly && !keyPrenomOnly){
+        alert("Colonne 'Nom' (ou 'Nom Prénom') introuvable dans le fichier.");
         e.target.value=''; return;
       }
 
       const targetKey = normalizeClasseKey(className);
       const matched = [];
       allRows.forEach(({row, sheetName})=>{
-        const nom = (row[keyNom]||'').toString().trim();
-        const prenom = (row[keyPrenom]||'').toString().trim();
-        if(!nom && !prenom) return;
+        let nomPrenom;
+        if(keyMerged){
+          nomPrenom = (row[keyMerged]||'').toString().trim();
+        }else{
+          const nom = (row[keyNomOnly]||'').toString().trim();
+          const prenom = (row[keyPrenomOnly]||'').toString().trim();
+          nomPrenom = `${nom} ${prenom}`.trim();
+        }
+        if(!nomPrenom) return;
         const classeVal = keyClasse ? (row[keyClasse]||'').toString().trim() : sheetName;
         if(normalizeClasseKey(classeVal) !== targetKey) return;
         const sexeRaw = normalize(row[keySexe]||'');
         const sexe = sexeRaw.startsWith('f') ? 'F' : 'G';
         matched.push({
           id: uid('el'),
-          nom, prenom, classe: className, sexe,
+          nomPrenom, classe: className, sexe,
           groupe: null,
           results: {}
         });
@@ -679,7 +690,7 @@ function escapeHtml(s){
   return (s===undefined||s===null?'':s.toString()).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function escapeAttr(s){ return escapeHtml(s); }
-function fullName(s){ return `${s.nom} ${s.prenom}`.trim(); }
+function fullName(s){ return s.nomPrenom; }
 
 /* ==================== RENDU PRINCIPAL ==================== */
 function renderAll(){
@@ -1080,11 +1091,14 @@ function buildRankInfo(rankedArray){
   });
   return {general, bySex};
 }
+const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
 function rankSuffix(rankInfo, s){
   const g = rankInfo.general.get(s.id);
   const sx = rankInfo.bySex.get(s.id);
   if(!g) return '';
-  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;">(${ordinal(g)} général · ${ordinal(sx)} ${sexLabelPlural(s.sexe)})</span>`;
+  const medal = MEDALS[g] ? MEDALS[g]+' ' : '';
+  const podiumStyle = MEDALS[g] ? 'font-weight:700;' : '';
+  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;${podiumStyle}">${medal}${ordinal(g)} général · ${ordinal(sx)} ${sexLabelPlural(s.sexe)}</span>`;
 }
 
 function statTable(title, data){
@@ -1114,7 +1128,7 @@ function sortComparator(col){
   return (a,b)=>{
     let av, bv;
     switch(col){
-      case 'nomPrenom': av=normalize(a.nom)+normalize(a.prenom); bv=normalize(b.nom)+normalize(b.prenom); break;
+      case 'nomPrenom': av=normalize(a.nomPrenom); bv=normalize(b.nomPrenom); break;
       case 'classe': av=normalize(a.classe); bv=normalize(b.classe); break;
       case 'sexe': av=a.sexe; bv=b.sexe; break;
       case 'leger': av = a.results.leger && !a.results.leger.absent ? a.results.leger.palier : -1;
