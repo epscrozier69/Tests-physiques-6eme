@@ -550,9 +550,12 @@ function handleClassImportFile(e, className){
       }
       const keys = Object.keys(allRows[0].row);
       // Colonne unique "Nom Prénom" déjà fusionnée, sinon deux colonnes séparées.
+      // Attention : "prenom" contient déjà les lettres "nom" (à la fin), donc on
+      // vérifie qu'il reste bien "nom" une fois "prenom" retiré du texte.
       const keyMerged = keys.find(k=>{
         const n = normalize(k);
-        return n.includes('nom') && n.includes('prenom');
+        if(!n.includes('prenom')) return false;
+        return n.split('prenom').join('').includes('nom');
       });
       const keyNomOnly = keys.find(k=> normalize(k).includes('nom') && !normalize(k).includes('prenom'));
       const keyPrenomOnly = keys.find(k=> normalize(k).includes('prenom'));
