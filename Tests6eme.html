@@ -258,31 +258,6 @@ select, input[type=number], input[type=text]{
 .timer-box .time{font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums;}
 .timer-box .sub{font-size:.9rem;opacity:.85;margin-top:4px;}
 
-.student-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
-  gap:10px;
-}
-.student-tile{
-  background:#fff;
-  border:2px solid var(--border);
-  border-radius:10px;
-  padding:12px 10px;
-  text-align:center;
-  cursor:pointer;
-  font-weight:600;
-  font-size:.85rem;
-  transition:all .12s ease;
-}
-.student-tile:hover{border-color:var(--primary);background:#eef2ff;transform:translateY(-2px);}
-.student-tile.finished{
-  cursor:default;
-  border-color:#cbd5e1;
-  background:#f8fafc;
-  color:var(--muted);
-}
-.student-tile .res{display:block;font-size:.72rem;margin-top:4px;color:var(--muted);}
-
 .current-student-box{
   text-align:center;
   padding:16px;
@@ -835,25 +810,55 @@ function renderLegerPanel(className, cls, students){
     <div class="inline-form">
       ${leger.running ? `<button class="btn btn-outline" style="color:#1e293b;background:#e2e8f0;" id="btnStopLeger" data-class="${escapeAttr(className)}">⏸️ Arrêter le test</button>` : ''}
     </div>
-    <h3 style="margin-top:16px;">Groupe actif : ${leger.activeGroup} — cliquer sur un élève de ce groupe pour enregistrer l'arrêt</h3>
-    <div class="student-grid">
+    <h3 style="margin-top:16px;">Groupe actif : ${leger.activeGroup} — cliquer sur "Arrêter" pour un élève de ce groupe</h3>
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
+        <th style="background:${HEADER_COLORS[1]}">Sexe</th>
+        <th style="background:${HEADER_COLORS[2]}">Groupe</th>
+        <th style="background:${HEADER_COLORS[3]}">Performance</th>
+        <th style="background:${HEADER_COLORS[4]}">Niveau</th>
+        <th style="background:${HEADER_COLORS[5]}">Classement sexe</th>
+        <th style="background:${HEADER_COLORS[6]}">Classement général</th>
+        <th style="background:${HEADER_COLORS[7]}">Action</th>
+      </tr></thead>
+      <tbody>
       ${(()=>{
         const legerRanks = buildTestRanking(students, 'leger');
         return students.map(s=>{
           const r = s.results.leger;
+          let perf, niveau, rangSexe, rangGeneral, action;
           if(r && r.absent){
-            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · Absent</span></div>`;
-          }
-          if(r && r.done){
+            perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+            rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>'; action = '';
+          }else if(r && r.done){
             const niv = niveauLeger(r.palier);
-            return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)} <span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>${rankSuffix(legerRanks, s)}</span></div>`;
+            perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)}`;
+            niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
+            const rc = rankCells(legerRanks, s);
+            rangSexe = rc.sexe; rangGeneral = rc.general; action = '';
+          }else{
+            perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
+            rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+            action = s.groupe===leger.activeGroup
+              ? `<button class="btn btn-accent small-btn leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">⏹️ Arrêter</button>`
+              : '<span class="muted">—</span>';
           }
-          if(s.groupe===leger.activeGroup){
-            return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
-          }
-          return `<div class="student-tile" style="opacity:.55;">${escapeHtml(fullName(s))}<span class="res">Groupe ${s.groupe} · en attente</span></div>`;
+          return `<tr>
+            <td>${escapeHtml(fullName(s))}</td>
+            <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
+            <td>${s.groupe}</td>
+            <td>${perf}</td>
+            <td>${niveau}</td>
+            <td>${rangSexe}</td>
+            <td>${rangGeneral}</td>
+            <td>${action}</td>
+          </tr>`;
         }).join('');
       })()}
+      </tbody>
+    </table>
     </div>`;
   }
 
@@ -866,10 +871,8 @@ function renderLegerPanel(className, cls, students){
     }
   }
 
-  return `<div class="grid-2">
-    <div>${compoTable}</div>
-    <div>${controls}${nextGroupBtn}${liveZone}</div>
-  </div>`;
+  return `${compoTable}
+  <div style="margin-top:18px;">${controls}${nextGroupBtn}${liveZone}</div>`;
 }
 
 function getLegerElapsed(leger){
@@ -963,12 +966,24 @@ function renderLongueurPanel(className, cls, students){
   }
 
   const longueurRanks = buildTestRanking(students, 'longueur');
-  const longueurFormat = (r, s)=> `${r.distance} cm <span class="badge badge-${niveauLongueur(r.distance)}">${LEVEL_LABEL[niveauLongueur(r.distance)]}</span>${rankSuffix(longueurRanks, s)}`;
   const rows = students.map(s=>{
     const r = s.results.longueur;
-    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : longueurFormat(r, s);
+    let perf, niveau, rangSexe, rangGeneral;
+    if(!r){
+      perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+    }else if(r.absent){
+      perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+    }else{
+      const niv = niveauLongueur(r.distance);
+      perf = `${r.distance} cm`;
+      niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
+      const rc = rankCells(longueurRanks, s);
+      rangSexe = rc.sexe; rangGeneral = rc.general;
+    }
     const nameCell = `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="longueur" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`;
-    return `<tr>${nameCell}<td>${resultHtml}</td></tr>`;
+    return `<tr>${nameCell}<td>${s.sexe==='F'?'Fille':'Garçon'}</td><td>${perf}</td><td>${niveau}</td><td>${rangSexe}</td><td>${rangGeneral}</td></tr>`;
   }).join('');
 
   const table = `
@@ -976,7 +991,11 @@ function renderLongueurPanel(className, cls, students){
     <table class="data-table">
       <thead><tr>
         <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
-        <th style="background:${HEADER_COLORS[2]}">Résultat</th>
+        <th style="background:${HEADER_COLORS[1]}">Sexe</th>
+        <th style="background:${HEADER_COLORS[2]}">Performance</th>
+        <th style="background:${HEADER_COLORS[3]}">Niveau</th>
+        <th style="background:${HEADER_COLORS[4]}">Classement sexe</th>
+        <th style="background:${HEADER_COLORS[5]}">Classement général</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
@@ -984,10 +1003,8 @@ function renderLongueurPanel(className, cls, students){
 
   return `
     <h3>🦘 Saut en longueur</h3>
-    <div class="grid-2">
-      <div>${currentBlock}</div>
-      <div>${table}</div>
-    </div>`;
+    ${currentBlock}
+    ${table}`;
 }
 
 /* ==================== TEST VITESSE ==================== */
@@ -1036,15 +1053,27 @@ function renderVitessePanel(className, cls, students){
   }
 
   const vitesseRanks = buildTestRanking(students, 'vitesse');
-  const vitesseFormat = (r, s)=> `${r.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(r.temps)}">${LEVEL_LABEL[niveauVitesse(r.temps)]}</span>${rankSuffix(vitesseRanks, s)}`;
   const rows = students.map(s=>{
     const r = s.results.vitesse;
-    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : vitesseFormat(r, s);
+    let perf, niveau, rangSexe, rangGeneral;
+    if(!r){
+      perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+    }else if(r.absent){
+      perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+    }else{
+      const niv = niveauVitesse(r.temps);
+      perf = `${r.temps.toFixed(2)} s`;
+      niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
+      const rc = rankCells(vitesseRanks, s);
+      rangSexe = rc.sexe; rangGeneral = rc.general;
+    }
     const clickable = !vit.running;
     const nameCell = clickable
       ? `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="vitesse" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`
       : `<td>${escapeHtml(fullName(s))}</td>`;
-    return `<tr>${nameCell}<td>${resultHtml}</td></tr>`;
+    return `<tr>${nameCell}<td>${s.sexe==='F'?'Fille':'Garçon'}</td><td>${perf}</td><td>${niveau}</td><td>${rangSexe}</td><td>${rangGeneral}</td></tr>`;
   }).join('');
 
   const table = `
@@ -1052,7 +1081,11 @@ function renderVitessePanel(className, cls, students){
     <table class="data-table">
       <thead><tr>
         <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
-        <th style="background:${HEADER_COLORS[2]}">Résultat</th>
+        <th style="background:${HEADER_COLORS[1]}">Sexe</th>
+        <th style="background:${HEADER_COLORS[2]}">Performance</th>
+        <th style="background:${HEADER_COLORS[3]}">Niveau</th>
+        <th style="background:${HEADER_COLORS[4]}">Classement sexe</th>
+        <th style="background:${HEADER_COLORS[5]}">Classement général</th>
       </tr></thead>
       <tbody>${rows}</tbody>
     </table>
@@ -1060,10 +1093,8 @@ function renderVitessePanel(className, cls, students){
 
   return `
     <h3>⚡ Vitesse 30m</h3>
-    <div class="grid-2">
-      <div>${currentBlock}</div>
-      <div>${table}</div>
-    </div>`;
+    ${currentBlock}
+    ${table}`;
 }
 
 /* ==================== ONGLET RESULTATS ==================== */
@@ -1090,7 +1121,6 @@ function computeStats(students){
 
 /* ---- Classements (rangs affichés en ligne dans le tableau principal) ---- */
 function ordinal(n){ return n===1 ? '1er' : n+'e'; }
-function sexLabelPlural(sexe){ return sexe==='F' ? 'filles' : 'garçons'; }
 function buildRankInfo(rankedArray){
   const general = new Map();
   rankedArray.forEach((s,i)=> general.set(s.id, i+1));
@@ -1101,14 +1131,19 @@ function buildRankInfo(rankedArray){
   return {general, bySex};
 }
 const MEDALS = {1:'🥇', 2:'🥈', 3:'🥉'};
-function rankSuffix(rankInfo, s){
+// Rangs (général / par sexe) sous forme de deux cellules séparées, avec médaille sur le top 3.
+function rankCells(rankInfo, s){
   const g = rankInfo.general.get(s.id);
   const sx = rankInfo.bySex.get(s.id);
-  if(!g) return '';
+  if(!g) return {general:'<span class="muted">—</span>', sexe:'<span class="muted">—</span>'};
   const gMedal = MEDALS[g] ? MEDALS[g]+' ' : '';
   const sxMedal = MEDALS[sx] ? MEDALS[sx]+' ' : '';
-  const podiumStyle = (MEDALS[g]||MEDALS[sx]) ? 'font-weight:700;' : '';
-  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;${podiumStyle}">${gMedal}${ordinal(g)} général · ${sxMedal}${ordinal(sx)} ${sexLabelPlural(s.sexe)}</span>`;
+  const boldG = MEDALS[g] ? 'font-weight:700;' : '';
+  const boldS = MEDALS[sx] ? 'font-weight:700;' : '';
+  return {
+    general: `<span style="${boldG}">${gMedal}${ordinal(g)}</span>`,
+    sexe: `<span style="${boldS}">${sxMedal}${ordinal(sx)}</span>`
+  };
 }
 function buildTestRanking(students, testKey){
   let ranked;
@@ -1139,8 +1174,8 @@ function statTable(title, data){
     <table class="data-table">
       <thead><tr>
         <th style="background:${HEADER_COLORS[5]}">Niveau</th>
-        <th style="background:${HEADER_COLORS[6]}">Garçons</th>
-        <th style="background:${HEADER_COLORS[7]}">Filles</th>
+        <th style="background:#3b82f6">Garçons</th>
+        <th style="background:#ec4899">Filles</th>
         <th style="background:${HEADER_COLORS[0]}">Total</th>
       </tr></thead>
       <tbody>${rowFor('A')}${rowFor('F')}${rowFor('S')}</tbody>
