@@ -1,11 +1,1420 @@
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /epsData/main {
-      allow read, write: if true;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0">
+<title>EPS Joliot Curie - Tests Physiques 6ème</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" defer></script>
+<style>
+:root{
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --text:#1e293b;
+  --muted:#64748b;
+  --border:#e2e8f0;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --a-besoin:#dc2626;
+  --fragile:#f97316;
+  --satisfaisant:#16a34a;
+  --radius:12px;
+  --col1:#3b82f6;
+  --col2:#8b5cf6;
+  --col3:#ec4899;
+  --col4:#f59e0b;
+  --col5:#06b6d4;
+  --col6:#6366f1;
+  --col7:#f43f5e;
+  --col8:#0ea5e9;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background:linear-gradient(180deg,#eef2ff 0%, #f1f5f9 220px, #f1f5f9 100%);
+  color:var(--text);
+  min-height:100vh;
+}
+header.app-header{
+  background:linear-gradient(120deg,#1d4ed8,#4f46e5 55%,#7c3aed);
+  color:#fff;
+  padding:12px 20px 10px;
+  box-shadow:0 4px 14px rgba(30,41,59,.15);
+}
+header.app-header h1{
+  margin:0 0 4px;
+  font-size:1.5rem;
+  letter-spacing:.3px;
+}
+header.app-header p{
+  margin:0;
+  font-size:.85rem;
+  opacity:.9;
+}
+.header-actions{
+  margin-top:10px;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.import-select-label{
+  color:#fff;
+  font-size:.85rem;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.btn{
+  border:none;
+  border-radius:8px;
+  padding:9px 16px;
+  font-size:.85rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:transform .08s ease, box-shadow .15s ease, opacity .15s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.15);
+}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn-primary{background:#fff;color:var(--primary-dark);}
+.btn-primary:hover{background:#e0e7ff;}
+.btn-accent{background:#22c55e;color:#fff;}
+.btn-accent:hover{background:#16a34a;}
+.btn-danger{background:#ef4444;color:#fff;}
+.btn-danger:hover{background:#dc2626;}
+.btn-outline{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.5);}
+.btn-outline:hover{background:rgba(255,255,255,.22);}
+.btn-soft{background:#e2e8f0;color:#1e293b;}
+.btn-soft:hover{background:#cbd5e1;}
+/* iOS ne déclenche pas toujours le sélecteur de fichier natif via un clic JS
+   sur un élément display:none (pas de boîte de rendu). On le cache donc hors
+   écran tout en gardant sa boîte de rendu. top/left explicites (au lieu de
+   "auto") pour un positionnement déterministe identique sur tous les moteurs
+   de rendu, et éviter qu'il ne recouvre accidentellement un autre élément. */
+input[type=file]{
+  position:absolute;
+  top:0;
+  left:0;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+nav.tabs{
+  display:flex;
+  gap:6px;
+  padding:6px 16px 0;
+  background:#fff;
+  overflow-x:auto;
+  border-bottom:2px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+nav.tabs button{
+  border:none;
+  background:transparent;
+  padding:7px 14px;
+  font-size:.85rem;
+  font-weight:600;
+  color:var(--muted);
+  cursor:pointer;
+  border-radius:8px 8px 0 0;
+  white-space:nowrap;
+  border-bottom:3px solid transparent;
+}
+nav.tabs button.active{
+  color:var(--primary-dark);
+  background:#eef2ff;
+  border-bottom:3px solid var(--primary);
+}
+nav.tabs button.tab-results{color:#7c3aed;}
+nav.tabs button.tab-results.active{background:#f3e8ff;border-bottom-color:#7c3aed;color:#6d28d9;}
+
+main{
+  padding:12px;
+  max-width:1500px;
+  margin:0 auto;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:12px;
+  box-shadow:0 1px 4px rgba(15,23,42,.06);
+  border:1px solid var(--border);
+}
+.card h2{
+  margin-top:0;
+  margin-bottom:8px;
+  font-size:1.1rem;
+}
+.card h3{
+  font-size:.95rem;
+  margin:0 0 8px;
+}
+.muted{color:var(--muted);font-size:.85rem;}
+.empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:var(--muted);
+}
+.empty-state .big-icon{font-size:2.6rem;display:block;margin-bottom:8px;}
+
+table.data-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  font-size:.85rem;
+  overflow:hidden;
+  border-radius:10px;
+}
+table.data-table th{
+  color:#fff;
+  padding:7px 8px;
+  text-align:left;
+  font-size:.78rem;
+  letter-spacing:.3px;
+  cursor:default;
+  white-space:nowrap;
+}
+table.data-table th.sortable{cursor:pointer;}
+table.data-table th.sortable:hover{filter:brightness(1.1);}
+table.data-table td{
+  padding:5px 8px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+}
+table.data-table tbody tr:hover td{background:#f8fafc;}
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+.badge{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  font-size:.75rem;
+  font-weight:700;
+  color:#fff;
+}
+.badge-A{background:var(--a-besoin);}
+.badge-F{background:var(--fragile);}
+.badge-S{background:var(--satisfaisant);}
+.badge-abs{background:#94a3b8;}
+.badge-dot{background:#cbd5e1;color:#334155;}
+
+select, input[type=number], input[type=text]{
+  padding:6px 8px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  font-size:.85rem;
+}
+
+.pill-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.pill{
+  background:#eef2ff;
+  color:#3730a3;
+  padding:6px 14px;
+  border-radius:999px;
+  font-size:.8rem;
+  font-weight:600;
+}
+
+.test-selector{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.test-selector label{
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:10px 16px;
+  cursor:pointer;
+  font-weight:600;
+  font-size:.85rem;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:#fff;
+}
+.test-selector input{margin:0;}
+.test-selector label.checked{
+  border-color:var(--primary);
+  background:#eef2ff;
+  color:var(--primary-dark);
+}
+
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media (max-width:900px){.grid-2{grid-template-columns:1fr;}}
+
+.timer-box{
+  text-align:center;
+  padding:12px;
+  border-radius:var(--radius);
+  background:linear-gradient(135deg,#1e293b,#334155);
+  color:#fff;
+  margin-bottom:12px;
+}
+.timer-box .time{font-size:2.2rem;font-weight:700;font-variant-numeric:tabular-nums;}
+.timer-box .sub{font-size:.9rem;opacity:.85;margin-top:4px;}
+
+.student-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:10px;
+}
+.student-tile{
+  background:#fff;
+  border:2px solid var(--border);
+  border-radius:10px;
+  padding:12px 10px;
+  text-align:center;
+  cursor:pointer;
+  font-weight:600;
+  font-size:.85rem;
+  transition:all .12s ease;
+}
+.student-tile:hover{border-color:var(--primary);background:#eef2ff;transform:translateY(-2px);}
+.student-tile.finished{
+  cursor:default;
+  border-color:#cbd5e1;
+  background:#f8fafc;
+  color:var(--muted);
+}
+.student-tile .res{display:block;font-size:.72rem;margin-top:4px;color:var(--muted);}
+
+.current-student-box{
+  text-align:center;
+  padding:16px;
+  border-radius:var(--radius);
+  background:#eef2ff;
+  border:2px dashed #a5b4fc;
+  margin-bottom:12px;
+}
+.current-student-box .name{font-size:1.3rem;font-weight:700;color:#1e3a8a;}
+.current-student-box .progress{font-size:.8rem;color:var(--muted);margin-top:4px;}
+
+.inline-form{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+
+.small-btn{padding:4px 10px;font-size:.72rem;border-radius:6px;}
+
+.pickable-row{cursor:pointer;font-weight:600;}
+.pickable-row:hover{color:var(--primary-dark);text-decoration:underline;}
+
+footer{
+  text-align:center;
+  color:var(--muted);
+  font-size:.75rem;
+  padding:20px;
+}
+
+@media (max-width:768px){
+  header.app-header h1{font-size:1.15rem;}
+  main{padding:10px;}
+  .card{padding:12px;}
+  table.data-table{font-size:.75rem;}
+  .timer-box .time{font-size:1.8rem;}
+}
+</style>
+</head>
+<body>
+
+<script>
+/* Filet de secours de diagnostic : affiche toute erreur JS directement sur la
+   page (utile sur iPad où la console n'est pas accessible facilement).
+   Syntaxe volontairement très basique pour rester compatible partout. */
+window.onerror = function(msg, url, line, col){
+  var banner = document.createElement('div');
+  banner.setAttribute('style', 'position:fixed;top:0;left:0;right:0;background:#dc2626;color:#fff;padding:12px;font-size:13px;z-index:99999;font-family:monospace;white-space:pre-wrap;');
+  banner.textContent = 'ERREUR JS : ' + msg + ' (ligne ' + line + ', colonne ' + col + ')';
+  document.body.appendChild(banner);
+  return false;
+};
+</script>
+
+<header class="app-header">
+  <h1>EPS Joliot Curie - Tests Physiques 6ème</h1>
+  <p>Suivi des performances : test navette Luc Léger, saut en longueur, vitesse 30m</p>
+  <div class="header-actions">
+    <label class="import-select-label">Classe à importer :
+      <select id="importClassSelect"></select>
+    </label>
+    <button class="btn btn-primary" id="btnImportClass">📥 Importer cette classe</button>
+    <input type="file" id="fileImportClass" accept=".xlsx,.xls,.csv">
+    <button class="btn btn-accent" id="btnExport">📤 Exporter les résultats (Excel)</button>
+    <button class="btn btn-outline" id="btnReset">🗑️ Réinitialiser les données</button>
+  </div>
+</header>
+
+<nav class="tabs" id="tabsNav"></nav>
+
+<main id="mainContent"></main>
+
+<audio id="legerAudio" src="assets/25QP61_bande_son_test_endurance.mp3" preload="none"></audio>
+
+<footer>Les données sont sauvegardées automatiquement et synchronisées entre vos appareils via Firebase.</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+'use strict';
+
+/* ==================== CONSTANTES ==================== */
+const STORAGE_KEY = 'epsJoliotCurieData_v1';
+const LEVEL_LABEL = {A:'A besoins', F:'Fragile', S:'Satisfaisant'};
+const HEADER_COLORS = ['var(--col1)','var(--col2)','var(--col3)','var(--col4)','var(--col5)','var(--col6)','var(--col7)','var(--col8)'];
+const AVAILABLE_CLASSES = ['6ème1', '6ème2', '6ème3', '6ème4'];
+
+/* ==================== SYNCHRONISATION FIREBASE ====================
+   Toutes les données sont stockées dans un unique document Firestore,
+   partagé entre tous les appareils utilisant cette application. */
+const firebaseConfig = {
+  apiKey: "AIzaSyDOM5iE4LC8aK-uSHiNlDTAUg9fTB94CNs",
+  authDomain: "eps-joliot-curie.firebaseapp.com",
+  projectId: "eps-joliot-curie",
+  storageBucket: "eps-joliot-curie.firebasestorage.app",
+  messagingSenderId: "620952703483",
+  appId: "1:620952703483:web:9572739f7d0e1f59c8bb5e"
+};
+firebase.initializeApp(firebaseConfig);
+const cloudDoc = firebase.firestore().collection('epsData').doc('main');
+let cloudSyncTimer = null;
+
+function scheduleCloudSync(){
+  if(cloudSyncTimer) clearTimeout(cloudSyncTimer);
+  cloudSyncTimer = setTimeout(()=>{
+    cloudSyncTimer = null;
+    cloudDoc.set(state).catch(e=> console.warn('Synchronisation cloud impossible (hors ligne ?)', e));
+  }, 800);
+}
+
+function loadFromCloud(){
+  return cloudDoc.get().then(docSnap=>{
+    if(docSnap.exists){
+      const data = docSnap.data();
+      if(data && data.classes){
+        state = data;
+        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+        renderAll();
+      }
     }
-    match /{document=**} {
-      allow read, write: if false;
+  }).catch(e=> console.warn('Chargement cloud impossible (hors ligne ?)', e));
+}
+
+/* ==================== ETAT ==================== */
+let state = {
+  classes: {},      // { className: { students:[...], selectedTest:null, leger:{...}, vitesse:{...}, longueur:{...} } }
+  classOrder: [],
+  activeTab: 'general' // 'general' | 'results' | className
+};
+
+let sortState = { col: 'nomPrenom', dir: 1 };
+let resultsClassFilter = 'all';
+let vitesseTimerHandle = null;
+let legerTimerHandle = null;
+
+/* ==================== PERSISTENCE ==================== */
+function saveState(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn('Sauvegarde locale impossible', e); }
+  scheduleCloudSync();
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.classes) state = parsed;
+    }
+  }catch(e){ console.warn('Chargement impossible', e); }
+}
+
+// Filet de secours : si la page se ferme pendant le délai de regroupement
+// des sauvegardes (800ms), on force l'envoi immédiat au lieu de le perdre.
+window.addEventListener('beforeunload', ()=>{
+  if(cloudSyncTimer){
+    clearTimeout(cloudSyncTimer);
+    cloudDoc.set(state);
+  }
+});
+
+/* ==================== UTILITAIRES ==================== */
+function normalize(str){
+  return (str||'').toString().normalize('NFD').replace(new RegExp('[\\u0300-\\u036f]','g'),'').toLowerCase().trim();
+}
+function uid(prefix){ return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+function sortStudentsAlpha(students){
+  return [...students].sort((a,b)=>{
+    const an = normalize(a.nom)+normalize(a.prenom);
+    const bn = normalize(b.nom)+normalize(b.prenom);
+    return an.localeCompare(bn);
+  });
+}
+
+function fmtMMSS(totalSeconds){
+  const m = Math.floor(totalSeconds/60);
+  const s = Math.floor(totalSeconds%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+/* ---- Barèmes ---- */
+function niveauLeger(palier){
+  if(palier<=1) return 'A';
+  if(palier<=3) return 'F';
+  return 'S';
+}
+function niveauLongueur(cm){
+  if(cm<=110) return 'A';
+  if(cm<=140) return 'F';
+  return 'S';
+}
+function niveauVitesse(sec){
+  if(sec>=6.8) return 'A';
+  if(sec>=6) return 'F';
+  return 'S';
+}
+
+/* ---- Calcul palier Luc Léger ----
+   Echauffement : 0-120s à 8 km/h (compte comme palier 0)
+   Puis palier n (n>=1) : 60s, vitesse = 8 + n*0.5
+   Règle : le palier/la vitesse comptés sont ceux du segment en cours
+   si l'élève a couru plus de la moitié du segment, sinon on redescend
+   d'un palier (0.5 km/h de moins). */
+function getLegerSegment(elapsedSec){
+  if(elapsedSec < 120){
+    return {palier:0, start:0, end:120, vitesse:8};
+  }
+  const n = Math.floor((elapsedSec-120)/60)+1;
+  const start = 120 + (n-1)*60;
+  const end = start+60;
+  return {palier:n, start, end, vitesse: 8 + n*0.5};
+}
+function computeLegerResult(elapsedSec){
+  const seg = getLegerSegment(Math.max(0,elapsedSec));
+  const fraction = (elapsedSec - seg.start) / (seg.end - seg.start);
+  if(fraction >= 0.5 || seg.palier === 0){
+    return {palier: seg.palier, vitesse: seg.vitesse};
+  }
+  return {palier: seg.palier-1, vitesse: seg.vitesse-0.5};
+}
+
+/* ==================== GESTION CLASSES / ELEVES ==================== */
+function ensureClass(name){
+  if(!state.classes[name]){
+    state.classes[name] = {
+      students: [],
+      selectedTest: null,
+      leger: {startingGroup:'A', activeGroup:null, running:false, startTime:null, elapsedFrozen:0},
+      vitesse: {running:false, startTime:null, selectedId:null},
+      longueur: {selectedId:null}
+    };
+    state.classOrder.push(name);
+  }
+  return state.classes[name];
+}
+
+function allStudentsFlat(){
+  let arr = [];
+  state.classOrder.forEach(cn=>{
+    state.classes[cn].students.forEach(s=> arr.push(s));
+  });
+  return arr;
+}
+
+/* ==================== IMPORT EXCEL / GOOGLE SHEET ====================
+   Le fichier importé contient l'ensemble des élèves du collège.
+   On filtre, à chaque import, uniquement les élèves de la classe visée
+   (colonne "Classe" si présente, sinon nom de l'onglet du classeur). */
+function normalizeClasseKey(s){
+  return normalize(s).replace(/[^a-z0-9]/g,'');
+}
+
+function handleClassImportFile(e, className){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try{
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, {type:'array'});
+      let allRows = [];
+      workbook.SheetNames.forEach(sheetName=>{
+        const sheet = workbook.Sheets[sheetName];
+        XLSX.utils.sheet_to_json(sheet, {defval:''}).forEach(row=> allRows.push({row, sheetName}));
+      });
+      if(!allRows.length){
+        alert('Le fichier est vide.');
+        e.target.value=''; return;
+      }
+      const keys = Object.keys(allRows[0].row);
+      const keyNom = keys.find(k=> normalize(k).includes('nom') && !normalize(k).includes('prenom'));
+      const keyPrenom = keys.find(k=> normalize(k).includes('prenom'));
+      const keySexe = keys.find(k=> normalize(k).includes('sexe') || normalize(k).includes('genre'));
+      const keyClasse = keys.find(k=> normalize(k).includes('classe'));
+      if(!keyNom && !keyPrenom){
+        alert("Colonnes 'Nom' et 'Prénom' introuvables dans le fichier.");
+        e.target.value=''; return;
+      }
+
+      const targetKey = normalizeClasseKey(className);
+      const matched = [];
+      allRows.forEach(({row, sheetName})=>{
+        const nom = (row[keyNom]||'').toString().trim();
+        const prenom = (row[keyPrenom]||'').toString().trim();
+        if(!nom && !prenom) return;
+        const classeVal = keyClasse ? (row[keyClasse]||'').toString().trim() : sheetName;
+        if(normalizeClasseKey(classeVal) !== targetKey) return;
+        const sexeRaw = normalize(row[keySexe]||'');
+        const sexe = sexeRaw.startsWith('f') ? 'F' : 'G';
+        matched.push({
+          id: uid('el'),
+          nom, prenom, classe: className, sexe,
+          groupe: null,
+          results: {}
+        });
+      });
+
+      if(!matched.length){
+        alert(`Aucun élève trouvé pour la classe "${className}" dans ce fichier. Vérifiez la colonne Classe (valeur attendue proche de "${className}").`);
+        e.target.value=''; return;
+      }
+
+      const cls = ensureClass(className);
+      cls.students = sortStudentsAlpha(matched);
+      const half = Math.ceil(cls.students.length/2);
+      cls.students.forEach((s,i)=> s.groupe = i < half ? 'A' : 'B');
+
+      state.activeTab = className;
+      saveState();
+      renderAll();
+      alert(`Import réussi : ${matched.length} élève(s) importé(s) pour ${className}.`);
+    }catch(err){
+      console.error(err);
+      alert("Erreur lors de la lecture du fichier : "+err.message);
+    }
+    e.target.value = '';
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* Import global (en-tête) : choix de la classe puis du fichier */
+let pendingImportClass = null;
+document.getElementById('btnImportClass').addEventListener('click', ()=>{
+  pendingImportClass = document.getElementById('importClassSelect').value;
+  document.getElementById('fileImportClass').click();
+});
+document.getElementById('fileImportClass').addEventListener('change', (e)=>{
+  handleClassImportFile(e, pendingImportClass);
+});
+
+/* ==================== EXPORT EXCEL ==================== */
+document.getElementById('btnExport').addEventListener('click', exportResults);
+function exportResults(){
+  const wb = XLSX.utils.book_new();
+  const rows = [['Nom Prénom','Classe','Sexe',
+    'Léger - Palier','Léger - Vitesse (km/h)','Léger - Temps','Léger - Niveau',
+    'Longueur - Distance (cm)','Longueur - Niveau',
+    'Vitesse - Temps (s)','Vitesse - Niveau']];
+
+  allStudentsFlat().forEach(s=>{
+    const l = s.results.leger, j = s.results.longueur, v = s.results.vitesse;
+    rows.push([
+      fullName(s), s.classe, s.sexe==='F'?'Fille':'Garçon',
+      l ? (l.absent?'Absent':l.palier) : '',
+      l && !l.absent ? l.vitesse : '',
+      l && !l.absent ? fmtMMSS(l.temps) : '',
+      l ? (l.absent?'Absent':LEVEL_LABEL[niveauLeger(l.palier)]) : '',
+      j ? (j.absent?'Absent':j.distance) : '',
+      j ? (j.absent?'Absent':LEVEL_LABEL[niveauLongueur(j.distance)]) : '',
+      v ? (v.absent?'Absent':v.temps.toFixed(2)) : '',
+      v ? (v.absent?'Absent':LEVEL_LABEL[niveauVitesse(v.temps)]) : ''
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, ws, 'Résultats');
+
+  state.classOrder.forEach(cn=>{
+    const cls = state.classes[cn];
+    const r2 = [['Nom Prénom','Sexe','Groupe']];
+    sortStudentsAlpha(cls.students).forEach(s=> r2.push([fullName(s), s.sexe==='F'?'Fille':'Garçon', s.groupe||'']));
+    const ws2 = XLSX.utils.aoa_to_sheet(r2);
+    XLSX.utils.book_append_sheet(wb, ws2, cn.substring(0,31));
+  });
+
+  XLSX.writeFile(wb, 'Resultats_Tests_Physiques_6eme.xlsx');
+}
+
+/* ==================== RESET ==================== */
+document.getElementById('btnReset').addEventListener('click', ()=>{
+  if(confirm('Cette action supprimera toutes les classes et tous les résultats enregistrés dans ce navigateur. Continuer ?')){
+    localStorage.removeItem(STORAGE_KEY);
+    state = {classes:{}, classOrder:[], activeTab:'general'};
+    renderAll();
+  }
+});
+
+/* ==================== RENDU : NAVIGATION ==================== */
+function renderTabs(){
+  const nav = document.getElementById('tabsNav');
+  let html = `<button data-tab="general" class="${state.activeTab==='general'?'active':''}">🏠 Général</button>`;
+  state.classOrder.forEach(cn=>{
+    html += `<button data-tab="${escapeAttr(cn)}" class="${state.activeTab===cn?'active':''}">🏷️ ${escapeHtml(cn)}</button>`;
+  });
+  if(state.classOrder.length){
+    html += `<button data-tab="results" class="tab-results ${state.activeTab==='results'?'active':''}">📊 Résultats</button>`;
+  }
+  nav.innerHTML = html;
+  nav.querySelectorAll('button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.activeTab = btn.dataset.tab;
+      saveState();
+      renderAll();
+    });
+  });
+}
+
+function escapeHtml(s){
+  return (s===undefined||s===null?'':s.toString()).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+function fullName(s){ return `${s.nom} ${s.prenom}`.trim(); }
+
+/* ==================== RENDU PRINCIPAL ==================== */
+function renderAll(){
+  renderTabs();
+  const main = document.getElementById('mainContent');
+  if(state.activeTab === 'general') main.innerHTML = renderGeneralTab();
+  else if(state.activeTab === 'results') main.innerHTML = renderResultsTab();
+  else main.innerHTML = renderClassTab(state.activeTab);
+  attachDynamicHandlers();
+}
+
+/* ---- Onglet Général : 5 colonnes ---- */
+function renderGeneralTab(){
+  const students = sortStudentsAlpha(allStudentsFlat());
+  if(!students.length){
+    return `<div class="card"><div class="empty-state">
+      <span class="big-icon">📋</span>
+      <h2>Aucune classe importée</h2>
+      <p>En haut de la page, choisissez une <strong>classe</strong> puis cliquez sur <strong>« Importer cette classe »</strong> pour charger le fichier Google Sheet / Excel du collège : seuls les élèves de la classe choisie seront conservés, dans un nouvel onglet.</p>
+    </div></div>`;
+  }
+  const cols = ['N°','Nom Prénom','Classe','Sexe','Groupe'];
+  let rows = students.map((s,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td>${escapeHtml(fullName(s))}</td>
+      <td>${escapeHtml(s.classe)}</td>
+      <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
+      <td>${s.groupe||'—'}</td>
+    </tr>`).join('');
+  return `
+  <div class="card">
+    <h2>Vue d'ensemble — tous les élèves</h2>
+    <div class="pill-row">
+      <span class="pill">${state.classOrder.length} classe(s)</span>
+      <span class="pill">${students.length} élève(s)</span>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>${cols.map((c,i)=>`<th style="background:${HEADER_COLORS[i%HEADER_COLORS.length]}">${c}</th>`).join('')}</tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ---- Onglet Classe ---- */
+function renderClassTab(className){
+  const cls = state.classes[className];
+  if(!cls) return `<div class="card">Classe introuvable.</div>`;
+  const students = sortStudentsAlpha(cls.students);
+
+  let testBlock = '';
+  if(cls.selectedTest === 'leger') testBlock = renderLegerPanel(className, cls, students);
+  else if(cls.selectedTest === 'longueur') testBlock = renderLongueurPanel(className, cls, students);
+  else if(cls.selectedTest === 'vitesse') testBlock = renderVitessePanel(className, cls, students);
+  else testBlock = `<div class="empty-state"><span class="big-icon">🎯</span><p>Choisissez un test ci-dessus pour commencer.</p></div>`;
+
+  return `
+  <div class="card">
+    <h2>${escapeHtml(className)} <span class="muted">(${students.length} élève(s))</span></h2>
+    <div class="pill-row">
+      <button class="btn btn-soft small-btn class-import-btn" data-class="${escapeAttr(className)}">📥 Réimporter cette classe (fichier collège)</button>
+      <input type="file" class="class-import-input" data-class="${escapeAttr(className)}" accept=".xlsx,.xls,.csv">
+    </div>
+    <div class="test-selector">
+      ${testOption(className,'leger','🏃 Test navette Luc Léger', cls.selectedTest)}
+      ${testOption(className,'longueur','🦘 Saut en longueur', cls.selectedTest)}
+      ${testOption(className,'vitesse','⚡ Vitesse 30m', cls.selectedTest)}
+    </div>
+  </div>
+  <div class="card">${testBlock}</div>`;
+}
+
+function testOption(className, value, label, current){
+  const checked = current===value ? 'checked' : '';
+  const cls = current===value ? 'checked' : '';
+  return `<label class="${cls}">
+    <input type="radio" name="test_${escapeAttr(className)}" value="${value}" ${checked} class="test-radio" data-class="${escapeAttr(className)}">
+    ${label}
+  </label>`;
+}
+
+/* ==================== TEST LUC LEGER ==================== */
+function renderLegerPanel(className, cls, students){
+  const leger = cls.leger;
+  const groupA = students.filter(s=>s.groupe==='A');
+  const groupB = students.filter(s=>s.groupe==='B');
+
+  const groupColumn = (groupStudents, groupLabel, otherGroupLabel)=> `
+    <h3>Groupe ${groupLabel} <span class="pill" style="margin-left:6px;">${groupStudents.length} élève(s)</span></h3>
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
+        <th style="background:${HEADER_COLORS[2]}">Sexe</th>
+        <th style="background:${HEADER_COLORS[4]}">Absent</th>
+        <th style="background:${HEADER_COLORS[3]}"></th>
+      </tr></thead>
+      <tbody>
+      ${groupStudents.map(s=>`
+        <tr>
+          <td>${escapeHtml(fullName(s))}</td>
+          <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
+          <td><input type="checkbox" class="leger-absent" data-class="${escapeAttr(className)}" data-student="${s.id}" ${s.results.leger && s.results.leger.absent ? 'checked':''} ${leger.running?'disabled':''}></td>
+          <td><button class="small-btn btn-soft group-move-btn" data-class="${escapeAttr(className)}" data-student="${s.id}" data-group="${otherGroupLabel}" ${leger.running?'disabled':''}>→ ${otherGroupLabel}</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+    </div>`;
+
+  const compoTable = `
+    <div class="grid-2">
+      <div>${groupColumn(groupA, 'A', 'B')}</div>
+      <div>${groupColumn(groupB, 'B', 'A')}</div>
+    </div>`;
+
+  let controls = '';
+  if(!leger.running){
+    controls = `
+    <div class="inline-form">
+      <label>Groupe qui commence :
+        <select id="startingGroupSelect" data-class="${escapeAttr(className)}">
+          <option value="A" ${leger.startingGroup==='A'?'selected':''}>Groupe A</option>
+          <option value="B" ${leger.startingGroup==='B'?'selected':''}>Groupe B</option>
+        </select>
+      </label>
+      <button class="btn btn-accent" id="btnStartLeger" data-class="${escapeAttr(className)}">▶️ Lancer le départ commun</button>
+    </div>`;
+  }
+
+  let liveZone = '';
+  if(leger.running || leger.elapsedFrozen>0){
+    const elapsed = leger.running ? getLegerElapsed(leger) : leger.elapsedFrozen;
+    const seg = getLegerSegment(elapsed);
+
+    liveZone = `
+    <div class="timer-box" id="legerTimerBox">
+      <div class="time" id="legerTimeDisplay">${fmtMMSS(elapsed)}</div>
+      <div class="sub">Groupe actif : ${leger.activeGroup} — Palier ${seg.palier} — ${seg.vitesse.toFixed(1)} km/h</div>
+    </div>
+    <div class="inline-form">
+      ${leger.running ? `<button class="btn btn-outline" style="color:#1e293b;background:#e2e8f0;" id="btnStopLeger" data-class="${escapeAttr(className)}">⏸️ Arrêter le test</button>` : ''}
+    </div>
+    <h3 style="margin-top:16px;">Élèves du groupe ${leger.activeGroup} — cliquer pour enregistrer l'arrêt</h3>
+    <div class="student-grid">
+      ${students.filter(s=>s.groupe===leger.activeGroup).map(s=>{
+        const r = s.results.leger;
+        if(r && r.absent){
+          return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Absent</span></div>`;
+        }
+        if(r && r.done){
+          return `<div class="student-tile finished">${escapeHtml(fullName(s))}<span class="res">Palier ${r.palier} · ${r.vitesse.toFixed(1)}km/h · ${fmtMMSS(r.temps)}</span></div>`;
+        }
+        return `<button class="student-tile leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">${escapeHtml(fullName(s))}</button>`;
+      }).join('')}
+    </div>`;
+  }
+
+  const groupDone = (g)=> students.filter(s=>s.groupe===g).every(s=> s.results.leger && (s.results.leger.absent || s.results.leger.done));
+  let nextGroupBtn = '';
+  if(!leger.running && leger.activeGroup && groupDone(leger.activeGroup)){
+    const remainingGroup = leger.activeGroup==='A' ? 'B' : 'A';
+    if(!groupDone(remainingGroup)){
+      nextGroupBtn = `<div class="inline-form"><button class="btn btn-accent" id="btnStartOtherGroup" data-class="${escapeAttr(className)}" data-group="${remainingGroup}">▶️ Lancer le groupe ${remainingGroup}</button></div>`;
     }
   }
+
+  return `<div class="grid-2">
+    <div>${compoTable}</div>
+    <div>${controls}${nextGroupBtn}${liveZone}</div>
+  </div>`;
 }
+
+function getLegerElapsed(leger){
+  return (Date.now() - leger.startTime)/1000 + (leger.elapsedBeforePause||0);
+}
+
+function startLegerGroup(className, group){
+  const cls = state.classes[className];
+  const leger = cls.leger;
+  leger.activeGroup = group;
+  leger.running = true;
+  leger.startTime = Date.now();
+  leger.elapsedBeforePause = 0;
+  leger.elapsedFrozen = 0;
+  const audio = document.getElementById('legerAudio');
+  audio.currentTime = 0;
+  audio.play().catch(()=>{});
+  saveState();
+  renderAll();
+  legerTimerHandle = setInterval(()=>{
+    const box = document.getElementById('legerTimeDisplay');
+    if(box){
+      const elapsed = getLegerElapsed(leger);
+      const seg = getLegerSegment(elapsed);
+      box.textContent = fmtMMSS(elapsed);
+      const sub = document.querySelector('#legerTimerBox .sub');
+      if(sub) sub.textContent = `Groupe actif : ${leger.activeGroup} — Palier ${seg.palier} — ${seg.vitesse.toFixed(1)} km/h`;
+    }
+  }, 500);
+}
+
+function stopLegerRun(className){
+  const cls = state.classes[className];
+  const leger = cls.leger;
+  if(legerTimerHandle){ clearInterval(legerTimerHandle); legerTimerHandle = null; }
+  if(leger.running){
+    leger.elapsedFrozen = getLegerElapsed(leger);
+  }
+  leger.running = false;
+  const audio = document.getElementById('legerAudio');
+  audio.pause();
+  saveState();
+  renderAll();
+}
+
+function recordLegerResult(className, studentId){
+  const cls = state.classes[className];
+  const leger = cls.leger;
+  const student = cls.students.find(s=>s.id===studentId);
+  if(!student) return;
+  const elapsed = leger.running ? getLegerElapsed(leger) : leger.elapsedFrozen;
+  const {palier, vitesse} = computeLegerResult(elapsed);
+  student.results.leger = {palier, vitesse, temps: elapsed, done:true, absent:false};
+  saveState();
+
+  // Vérifie si tous les élèves actifs du groupe ont terminé -> stoppe la bande son
+  const groupStudents = cls.students.filter(s=>s.groupe===leger.activeGroup);
+  const allDone = groupStudents.every(s=> s.results.leger && (s.results.leger.absent || s.results.leger.done));
+  if(allDone){
+    stopLegerRun(className);
+  }else{
+    renderAll();
+  }
+}
+
+/* ==================== TEST LONGUEUR ==================== */
+function renderLongueurPanel(className, cls, students){
+  const remaining = students.filter(s=> !s.results.longueur);
+  const doneCount = students.length - remaining.length;
+  let current = cls.longueur.selectedId ? students.find(s=>s.id===cls.longueur.selectedId) : null;
+  if(!current) current = remaining[0];
+
+  let currentBlock = '';
+  if(current){
+    const existingResult = current.results.longueur;
+    const isEdit = !!existingResult;
+    const existingValue = isEdit ? 0 : '';
+    currentBlock = `
+    <div class="current-student-box">
+      <div class="name">${escapeHtml(fullName(current))}</div>
+      <div class="progress">${doneCount}/${students.length} élève(s) testé(s)</div>
+      <div class="inline-form">
+        <label>Distance (cm) : <input type="number" id="longueurInput" min="0" step="1" style="width:100px;" value="${existingValue}"></label>
+        <button class="btn btn-accent" id="btnValidLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">${isEdit ? '💾 Enregistrer' : '✅ Valider'}</button>
+        <button class="btn btn-soft" id="btnAbsentLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">🚫 Absent</button>
+      </div>
+      <div class="muted" style="margin-top:6px;">Astuce : cliquez sur un élève dans la liste pour l'évaluer ou modifier son résultat. La touche Entrée valide et passe à l'élève suivant.</div>
+    </div>`;
+  }else{
+    currentBlock = `<div class="empty-state"><span class="big-icon">✅</span><p>Tous les élèves ont été testés.</p></div>`;
+  }
+
+  const longueurFormat = (r)=> `${r.distance} cm <span class="badge badge-${niveauLongueur(r.distance)}">${LEVEL_LABEL[niveauLongueur(r.distance)]}</span>`;
+  const rows = students.map(s=>{
+    const r = s.results.longueur;
+    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : longueurFormat(r);
+    const nameCell = `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="longueur" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`;
+    return `<tr>${nameCell}<td>${resultHtml}</td></tr>`;
+  }).join('');
+
+  const table = `
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
+        <th style="background:${HEADER_COLORS[2]}">Résultat</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+
+  return `
+    <h3>🦘 Saut en longueur</h3>
+    <div class="grid-2">
+      <div>${currentBlock}</div>
+      <div>${table}</div>
+    </div>`;
+}
+
+/* ==================== TEST VITESSE ==================== */
+function renderVitessePanel(className, cls, students){
+  const vit = cls.vitesse;
+  const remaining = students.filter(s=> !s.results.vitesse);
+  const doneCount = students.length - remaining.length;
+  let current = vit.selectedId ? students.find(s=>s.id===vit.selectedId) : null;
+  if(!current) current = remaining[0];
+
+  let currentBlock = '';
+  if(current){
+    const existingResult = current.results.vitesse;
+    const isEdit = !!existingResult;
+    if(isEdit){
+      const existingValue = 0;
+      currentBlock = `
+      <div class="current-student-box">
+        <div class="name">${escapeHtml(fullName(current))}</div>
+        <div class="progress">${doneCount}/${students.length} élève(s) testé(s)</div>
+        <div class="inline-form">
+          <label>Temps (s) : <input type="number" id="vitesseEditInput" min="0" step="0.01" style="width:100px;" value="${existingValue}"></label>
+          <button class="btn btn-accent" id="btnSaveVitesseEdit" data-class="${escapeAttr(className)}" data-student="${current.id}">💾 Enregistrer</button>
+          <button class="btn btn-soft" id="btnAbsentVitesse" data-class="${escapeAttr(className)}" data-student="${current.id}">🚫 Absent</button>
+        </div>
+        <div class="muted" style="margin-top:6px;">Modification du résultat de ${escapeHtml(fullName(current))}.</div>
+      </div>`;
+    }else{
+      currentBlock = `
+      <div class="current-student-box">
+        <div class="name">${escapeHtml(fullName(current))}</div>
+        <div class="progress">${doneCount}/${students.length} élève(s) testé(s)</div>
+        <div class="timer-box">
+          <div class="time" id="vitesseTimeDisplay">0.00 s</div>
+        </div>
+        <div class="inline-form">
+          ${!vit.running ? `<button class="btn btn-accent" id="btnStartVitesse" data-class="${escapeAttr(className)}" data-student="${current.id}">▶️ Départ</button>` :
+            `<button class="btn btn-danger" id="btnStopVitesse" data-class="${escapeAttr(className)}" data-student="${current.id}">⏹️ Arrêt</button>`}
+          <button class="btn btn-soft" id="btnAbsentVitesse" data-class="${escapeAttr(className)}" data-student="${current.id}" ${vit.running?'disabled':''}>🚫 Absent</button>
+        </div>
+        <div class="muted" style="margin-top:6px;">${vit.running ? '' : "Astuce : cliquez sur un élève dans la liste pour l'évaluer ou modifier son résultat."}</div>
+      </div>`;
+    }
+  }else{
+    currentBlock = `<div class="empty-state"><span class="big-icon">✅</span><p>Tous les élèves ont été testés.</p></div>`;
+  }
+
+  const vitesseFormat = (r)=> `${r.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(r.temps)}">${LEVEL_LABEL[niveauVitesse(r.temps)]}</span>`;
+  const rows = students.map(s=>{
+    const r = s.results.vitesse;
+    const resultHtml = !r ? '<span class="muted">en attente</span>' : r.absent ? '<span class="badge badge-abs">Absent</span>' : vitesseFormat(r);
+    const clickable = !vit.running;
+    const nameCell = clickable
+      ? `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="vitesse" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`
+      : `<td>${escapeHtml(fullName(s))}</td>`;
+    return `<tr>${nameCell}<td>${resultHtml}</td></tr>`;
+  }).join('');
+
+  const table = `
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
+        <th style="background:${HEADER_COLORS[2]}">Résultat</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+
+  return `
+    <h3>⚡ Vitesse 30m</h3>
+    <div class="grid-2">
+      <div>${currentBlock}</div>
+      <div>${table}</div>
+    </div>`;
+}
+
+/* ==================== ONGLET RESULTATS ==================== */
+function computeStats(students){
+  const tests = {leger:{}, longueur:{}, vitesse:{}};
+  ['A','F','S'].forEach(lvl=>{
+    tests.leger[lvl] = {G:0,F:0};
+    tests.longueur[lvl] = {G:0,F:0};
+    tests.vitesse[lvl] = {G:0,F:0};
+  });
+  students.forEach(s=>{
+    if(s.results.leger && !s.results.leger.absent){
+      tests.leger[niveauLeger(s.results.leger.palier)][s.sexe]++;
+    }
+    if(s.results.longueur && !s.results.longueur.absent){
+      tests.longueur[niveauLongueur(s.results.longueur.distance)][s.sexe]++;
+    }
+    if(s.results.vitesse && !s.results.vitesse.absent){
+      tests.vitesse[niveauVitesse(s.results.vitesse.temps)][s.sexe]++;
+    }
+  });
+  return tests;
+}
+
+/* ---- Classements (rangs affichés en ligne dans le tableau principal) ---- */
+function ordinal(n){ return n===1 ? '1er' : n+'e'; }
+function sexLabelPlural(sexe){ return sexe==='F' ? 'filles' : 'garçons'; }
+function buildRankInfo(rankedArray){
+  const general = new Map();
+  rankedArray.forEach((s,i)=> general.set(s.id, i+1));
+  const bySex = new Map();
+  ['F','G'].forEach(sx=>{
+    rankedArray.filter(s=>s.sexe===sx).forEach((s,i)=> bySex.set(s.id, i+1));
+  });
+  return {general, bySex};
+}
+function rankSuffix(rankInfo, s){
+  const g = rankInfo.general.get(s.id);
+  const sx = rankInfo.bySex.get(s.id);
+  if(!g) return '';
+  return ` <span class="muted" style="white-space:nowrap;font-size:.72rem;">(${ordinal(g)} général · ${ordinal(sx)} ${sexLabelPlural(s.sexe)})</span>`;
+}
+
+function statTable(title, data){
+  const rowFor = (lvl)=>{
+    const g = data[lvl].G, f = data[lvl].F;
+    return `<tr><td><span class="badge badge-${lvl}">${LEVEL_LABEL[lvl]}</span></td><td>${g}</td><td>${f}</td><td>${g+f}</td></tr>`;
+  };
+  return `
+  <div>
+    <h3>${title}</h3>
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[5]}">Niveau</th>
+        <th style="background:${HEADER_COLORS[6]}">Garçons</th>
+        <th style="background:${HEADER_COLORS[7]}">Filles</th>
+        <th style="background:${HEADER_COLORS[0]}">Total</th>
+      </tr></thead>
+      <tbody>${rowFor('A')}${rowFor('F')}${rowFor('S')}</tbody>
+    </table>
+    </div>
+  </div>`;
+}
+
+function sortComparator(col){
+  const dir = sortState.dir;
+  return (a,b)=>{
+    let av, bv;
+    switch(col){
+      case 'nomPrenom': av=normalize(a.nom)+normalize(a.prenom); bv=normalize(b.nom)+normalize(b.prenom); break;
+      case 'classe': av=normalize(a.classe); bv=normalize(b.classe); break;
+      case 'sexe': av=a.sexe; bv=b.sexe; break;
+      case 'leger': av = a.results.leger && !a.results.leger.absent ? a.results.leger.palier : -1;
+                    bv = b.results.leger && !b.results.leger.absent ? b.results.leger.palier : -1; break;
+      case 'longueur': av = a.results.longueur && !a.results.longueur.absent ? a.results.longueur.distance : -1;
+                        bv = b.results.longueur && !b.results.longueur.absent ? b.results.longueur.distance : -1; break;
+      case 'vitesse': av = a.results.vitesse && !a.results.vitesse.absent ? -a.results.vitesse.temps : -9999;
+                       bv = b.results.vitesse && !b.results.vitesse.absent ? -b.results.vitesse.temps : -9999; break;
+      default: av=''; bv='';
+    }
+    if(av<bv) return -1*dir;
+    if(av>bv) return 1*dir;
+    return 0;
+  };
+}
+
+function renderResultsTab(){
+  const baseStudents = resultsClassFilter==='all' ? allStudentsFlat() : allStudentsFlat().filter(s=>s.classe===resultsClassFilter);
+  const students = [...baseStudents].sort(sortComparator(sortState.col));
+  const stats = computeStats(baseStudents);
+
+  const classFilterOptions = `<option value="all" ${resultsClassFilter==='all'?'selected':''}>Toutes les classes</option>` +
+    state.classOrder.map(cn=>`<option value="${escapeAttr(cn)}" ${resultsClassFilter===cn?'selected':''}>${escapeHtml(cn)}</option>`).join('');
+
+  const cols = [
+    {key:'nomPrenom', label:'Nom Prénom'},
+    {key:'classe', label:'Classe'},
+    {key:'sexe', label:'Sexe'},
+    {key:'leger', label:'Luc Léger'},
+    {key:'longueur', label:'Longueur'},
+    {key:'vitesse', label:'Vitesse'}
+  ];
+
+  const legerRanking = baseStudents.filter(s=>s.results.leger && !s.results.leger.absent)
+    .sort((a,b)=> b.results.leger.palier - a.results.leger.palier || b.results.leger.vitesse - a.results.leger.vitesse);
+  const longueurRanking = baseStudents.filter(s=>s.results.longueur && !s.results.longueur.absent)
+    .sort((a,b)=> b.results.longueur.distance - a.results.longueur.distance);
+  const vitesseRanking = baseStudents.filter(s=>s.results.vitesse && !s.results.vitesse.absent)
+    .sort((a,b)=> a.results.vitesse.temps - b.results.vitesse.temps);
+  const legerRanks = buildRankInfo(legerRanking);
+  const longueurRanks = buildRankInfo(longueurRanking);
+  const vitesseRanks = buildRankInfo(vitesseRanking);
+
+  const rows = students.map(s=>{
+    const l = s.results.leger, j = s.results.longueur, v = s.results.vitesse;
+    const legerCell = !l ? '<span class="muted">—</span>' : l.absent ? '<span class="badge badge-abs">Absent</span>' :
+      `Palier ${l.palier} · ${l.vitesse.toFixed(1)}km/h <span class="badge badge-${niveauLeger(l.palier)}">${LEVEL_LABEL[niveauLeger(l.palier)]}</span>${rankSuffix(legerRanks, s)}`;
+    const longCell = !j ? '<span class="muted">—</span>' : j.absent ? '<span class="badge badge-abs">Absent</span>' :
+      `${j.distance} cm <span class="badge badge-${niveauLongueur(j.distance)}">${LEVEL_LABEL[niveauLongueur(j.distance)]}</span>${rankSuffix(longueurRanks, s)}`;
+    const vitCell = !v ? '<span class="muted">—</span>' : v.absent ? '<span class="badge badge-abs">Absent</span>' :
+      `${v.temps.toFixed(2)} s <span class="badge badge-${niveauVitesse(v.temps)}">${LEVEL_LABEL[niveauVitesse(v.temps)]}</span>${rankSuffix(vitesseRanks, s)}`;
+    return `<tr>
+      <td>${escapeHtml(fullName(s))}</td><td>${escapeHtml(s.classe)}</td>
+      <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
+      <td>${legerCell}</td><td>${longCell}</td><td>${vitCell}</td>
+    </tr>`;
+  }).join('');
+
+  const thead = cols.map((c,i)=>{
+    const arrow = sortState.col===c.key ? (sortState.dir===1?' ▲':' ▼') : '';
+    return `<th class="sortable" data-sort="${c.key}" style="background:${HEADER_COLORS[i%HEADER_COLORS.length]}">${c.label}${arrow}</th>`;
+  }).join('');
+
+  return `
+  <div class="card">
+    <h2>📊 Résultats${resultsClassFilter==='all' ? ' — toutes classes' : ' — '+escapeHtml(resultsClassFilter)}</h2>
+    <div class="pill-row">
+      <label>Filtrer par classe :
+        <select id="resultsClassFilterSelect">${classFilterOptions}</select>
+      </label>
+    </div>
+    <div class="table-wrap">
+      <table class="data-table">
+        <thead><tr>${thead}</tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" class="muted">Aucun résultat enregistré.</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Statistiques</h2>
+    <div class="grid-2">
+      ${statTable('🏃 Luc Léger', stats.leger)}
+      ${statTable('🦘 Longueur', stats.longueur)}
+    </div>
+    <div style="margin-top:16px;">
+      ${statTable('⚡ Vitesse 30m', stats.vitesse)}
+    </div>
+  </div>`;
+}
+
+/* ==================== HANDLERS DYNAMIQUES ==================== */
+function attachDynamicHandlers(){
+  // Import par onglet de classe (réimport ciblé)
+  document.querySelectorAll('.class-import-btn').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const input = el.parentElement.querySelector('.class-import-input');
+      input.click();
+    });
+  });
+  document.querySelectorAll('.class-import-input').forEach(el=>{
+    el.addEventListener('change', (e)=> handleClassImportFile(e, el.dataset.class));
+  });
+
+  // Sélection du test
+  document.querySelectorAll('.test-radio').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const cls = state.classes[el.dataset.class];
+      cls.selectedTest = el.value;
+      saveState();
+      renderAll();
+    });
+  });
+
+  // Groupes (Léger)
+  document.querySelectorAll('.group-move-btn').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const cls = state.classes[el.dataset.class];
+      const s = cls.students.find(x=>x.id===el.dataset.student);
+      s.groupe = el.dataset.group;
+      saveState();
+      renderAll();
+    });
+  });
+  document.querySelectorAll('.leger-absent').forEach(el=>{
+    el.addEventListener('change', ()=>{
+      const cls = state.classes[el.dataset.class];
+      const s = cls.students.find(x=>x.id===el.dataset.student);
+      if(el.checked) s.results.leger = {absent:true};
+      else delete s.results.leger;
+      saveState();
+      renderAll();
+    });
+  });
+
+  const startingSel = document.getElementById('startingGroupSelect');
+  if(startingSel){
+    startingSel.addEventListener('change', ()=>{
+      state.classes[startingSel.dataset.class].leger.startingGroup = startingSel.value;
+      saveState();
+    });
+  }
+
+  const btnStartLeger = document.getElementById('btnStartLeger');
+  if(btnStartLeger){
+    btnStartLeger.addEventListener('click', ()=>{
+      const cls = state.classes[btnStartLeger.dataset.class];
+      startLegerGroup(btnStartLeger.dataset.class, cls.leger.startingGroup);
+    });
+  }
+  const btnStartOther = document.getElementById('btnStartOtherGroup');
+  if(btnStartOther){
+    btnStartOther.addEventListener('click', ()=>{
+      startLegerGroup(btnStartOther.dataset.class, btnStartOther.dataset.group);
+    });
+  }
+  const btnStopLeger = document.getElementById('btnStopLeger');
+  if(btnStopLeger){
+    btnStopLeger.addEventListener('click', ()=> stopLegerRun(btnStopLeger.dataset.class));
+  }
+  document.querySelectorAll('.leger-stop-btn').forEach(el=>{
+    el.addEventListener('click', ()=> recordLegerResult(el.dataset.class, el.dataset.student));
+  });
+
+  // Longueur
+  const btnValidLongueur = document.getElementById('btnValidLongueur');
+  if(btnValidLongueur){
+    btnValidLongueur.addEventListener('click', ()=>{
+      const input = document.getElementById('longueurInput');
+      recordResult(btnValidLongueur.dataset.class, 'longueur', btnValidLongueur.dataset.student, input.value);
+    });
+  }
+  const longueurInput = document.getElementById('longueurInput');
+  if(longueurInput){
+    longueurInput.addEventListener('keydown', (ev)=>{
+      if(ev.key==='Enter'){
+        ev.preventDefault();
+        document.getElementById('btnValidLongueur').click();
+      }
+    });
+    longueurInput.focus();
+  }
+  const btnAbsentLongueur = document.getElementById('btnAbsentLongueur');
+  if(btnAbsentLongueur){
+    btnAbsentLongueur.addEventListener('click', ()=>{
+      const cls = state.classes[btnAbsentLongueur.dataset.class];
+      const s = cls.students.find(x=>x.id===btnAbsentLongueur.dataset.student);
+      s.results.longueur = {absent:true};
+      cls.longueur.selectedId = null;
+      saveState();
+      renderAll();
+    });
+  }
+
+  // Vitesse
+  const btnStartVitesse = document.getElementById('btnStartVitesse');
+  if(btnStartVitesse){
+    btnStartVitesse.addEventListener('click', ()=>{
+      const cls = state.classes[btnStartVitesse.dataset.class];
+      cls.vitesse.running = true;
+      cls.vitesse.startTime = Date.now();
+      renderAll();
+      const display = document.getElementById('vitesseTimeDisplay');
+      vitesseTimerHandle = setInterval(()=>{
+        if(display) display.textContent = ((Date.now()-cls.vitesse.startTime)/1000).toFixed(2)+' s';
+      }, 40);
+    });
+  }
+  const btnStopVitesse = document.getElementById('btnStopVitesse');
+  if(btnStopVitesse){
+    btnStopVitesse.addEventListener('click', ()=>{
+      const cls = state.classes[btnStopVitesse.dataset.class];
+      const elapsed = (Date.now()-cls.vitesse.startTime)/1000;
+      if(vitesseTimerHandle){ clearInterval(vitesseTimerHandle); vitesseTimerHandle=null; }
+      cls.vitesse.running = false;
+      const s = cls.students.find(x=>x.id===btnStopVitesse.dataset.student);
+      s.results.vitesse = {temps: elapsed, absent:false};
+      cls.vitesse.selectedId = null;
+      saveState();
+      renderAll();
+    });
+  }
+  const btnAbsentVitesse = document.getElementById('btnAbsentVitesse');
+  if(btnAbsentVitesse){
+    btnAbsentVitesse.addEventListener('click', ()=>{
+      const cls = state.classes[btnAbsentVitesse.dataset.class];
+      const s = cls.students.find(x=>x.id===btnAbsentVitesse.dataset.student);
+      s.results.vitesse = {absent:true};
+      cls.vitesse.selectedId = null;
+      saveState();
+      renderAll();
+    });
+  }
+  const btnSaveVitesseEdit = document.getElementById('btnSaveVitesseEdit');
+  if(btnSaveVitesseEdit){
+    btnSaveVitesseEdit.addEventListener('click', ()=>{
+      const input = document.getElementById('vitesseEditInput');
+      recordResult(btnSaveVitesseEdit.dataset.class, 'vitesse', btnSaveVitesseEdit.dataset.student, input.value);
+    });
+  }
+
+  // Clic direct sur un élève dans la liste (longueur / vitesse) :
+  // l'encadré de gauche affiche sa saisie (nouvelle performance ou modification si déjà enregistré)
+  document.querySelectorAll('.pickable-row').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const cls = state.classes[el.dataset.class];
+      cls[el.dataset.test].selectedId = el.dataset.student;
+      saveState();
+      renderAll();
+    });
+  });
+
+  // Filtre par classe (onglet Résultats)
+  const resultsFilterSel = document.getElementById('resultsClassFilterSelect');
+  if(resultsFilterSel){
+    resultsFilterSel.addEventListener('change', ()=>{
+      resultsClassFilter = resultsFilterSel.value;
+      renderAll();
+    });
+  }
+
+  // Tri du tableau résultats
+  document.querySelectorAll('th.sortable').forEach(th=>{
+    th.addEventListener('click', ()=>{
+      const col = th.dataset.sort;
+      if(sortState.col === col) sortState.dir *= -1;
+      else { sortState.col = col; sortState.dir = 1; }
+      renderAll();
+    });
+  });
+
+}
+
+/* Enregistre une valeur numérique (distance ou temps) pour un élève, depuis
+   l'encadré de saisie, puis relâche la sélection pour revenir à l'élève suivant. */
+function recordResult(className, test, studentId, rawValue){
+  const val = parseFloat(rawValue);
+  if(isNaN(val)){ alert('Merci de saisir une valeur valide.'); return; }
+  const cls = state.classes[className];
+  const s = cls.students.find(x=>x.id===studentId);
+  if(test==='longueur') s.results.longueur = {distance: val, absent:false};
+  else s.results.vitesse = {temps: val, absent:false};
+  cls[test].selectedId = null;
+  saveState();
+  renderAll();
+}
+
+/* ==================== INIT ==================== */
+(function populateImportClassSelect(){
+  const selectEl = document.getElementById('importClassSelect');
+  AVAILABLE_CLASSES.forEach(c=>{
+    const opt = document.createElement('option');
+    opt.value = c;
+    opt.textContent = c;
+    selectEl.appendChild(opt);
+  });
+})();
+loadState();
+if(!state.activeTab) state.activeTab = 'general';
+renderAll();
+loadFromCloud();
+</script>
+</body>
+</html>
