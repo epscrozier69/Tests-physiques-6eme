@@ -1,0 +1,2107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>EPS Joliot Curie - Tests Physiques</title>
+<style>
+:root{
+  --bg:#f2f5fb;
+  --card:#ffffff;
+  --text:#1e293b;
+  --muted:#64748b;
+  --primary:#2563eb;
+  --primary-dark:#1d4ed8;
+  --border:#e2e8f0;
+  --niveau-abesoin:#dc2626;
+  --niveau-fragile:#ea580c;
+  --niveau-satisfaisant:#16a34a;
+  --col-1:#2563eb;
+  --col-2:#7c3aed;
+  --col-3:#db2777;
+  --col-4:#4f46e5;
+  --col-5:#0ea5e9;
+  --col-6:#9333ea;
+  --col-7:#c026d3;
+  --col-8:#4338ca;
+  --col-1-light:#dbeafe;
+  --col-2-light:#ede9fe;
+  --col-3-light:#fce7f3;
+  --col-4-light:#e0e7ff;
+  --col-5-light:#e0f2fe;
+  --col-6-light:#f3e8ff;
+  --col-7-light:#fae8ff;
+  --col-8-light:#e0e0fc;
+  --garcon:#2563eb;
+  --fille:#ec4899;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:40px;
+}
+header.app-header{
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+  color:#fff;
+  padding:10px 20px;
+  box-shadow:0 2px 8px rgba(0,0,0,.15);
+  position:sticky;top:0;z-index:50;
+}
+header.app-header h1{
+  margin:0;
+  font-size:1.4rem;
+  font-weight:700;
+  letter-spacing:.3px;
+}
+header.app-header p{
+  margin:2px 0 0;
+  font-size:.85rem;
+  opacity:.9;
+}
+nav.tabs{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding:6px 14px;
+  background:#fff;
+  border-bottom:2px solid var(--border);
+  position:sticky;top:52px;z-index:49;
+  -webkit-overflow-scrolling:touch;
+}
+nav.tabs::-webkit-scrollbar{height:6px;}
+.tab-btn{
+  border:none;
+  background:#eef2ff;
+  color:var(--primary-dark);
+  padding:10px 16px;
+  border-radius:10px;
+  font-size:.9rem;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+  min-height:40px;
+  transition:.15s;
+}
+.tab-btn:hover{background:#dbe4ff;}
+.tab-btn.active{background:var(--primary);color:#fff;}
+.tab-btn.tab-add{background:#f0fdf4;color:#166534;border:1px dashed #16a34a;}
+main{padding:10px 16px;max-width:1400px;margin:0 auto;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.card{
+  background:var(--card);
+  border-radius:14px;
+  padding:10px 14px;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+  margin-bottom:10px;
+}
+.card h2{margin-top:0;font-size:1.1rem;}
+.card h3{margin:4px 0;font-size:.95rem;}
+.card p{margin:4px 0;}
+.row-flex{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:.85rem;
+  color:#fff;
+}
+.badge.groupA{background:var(--col-1);}
+.badge.groupB{background:var(--col-2);}
+button{
+  font-family:inherit;
+  cursor:pointer;
+  border:none;
+  border-radius:10px;
+  padding:10px 16px;
+  font-size:.9rem;
+  font-weight:600;
+  min-height:42px;
+}
+.btn-primary{background:var(--primary);color:#fff;}
+.btn-primary:hover{background:var(--primary-dark);}
+.btn-secondary{background:#e2e8f0;color:#1e293b;}
+.btn-secondary:hover{background:#cbd5e1;}
+.btn-danger{background:#fee2e2;color:#b91c1c;}
+.btn-danger:hover{background:#fecaca;}
+.btn-success{background:#dcfce7;color:#166534;}
+select,input[type=number],input[type=text]{
+  font-family:inherit;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  font-size:.9rem;
+  min-height:38px;
+}
+.table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:10px;border:1px solid var(--border);}
+table{border-collapse:collapse;width:100%;font-size:.85rem;min-width:600px;}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th{color:#fff;position:sticky;top:0;cursor:pointer;user-select:none;}
+tbody tr:hover{background:#f8fafc;}
+tbody tr.row-clickable{cursor:pointer;}
+tbody tr.row-done{opacity:.55;}
+tbody tr.row-absent{opacity:.4;text-decoration:line-through;}
+td.sticky-col,th.sticky-col{position:sticky;left:0;background:#fff;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.04);}
+thead th.sticky-col{background:#334155;z-index:3;}
+.niveau-pill{
+  display:inline-block;
+  padding:3px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:.78rem;
+  color:#fff;
+}
+.niveau-A{background:var(--niveau-abesoin);}
+.niveau-F{background:var(--niveau-fragile);}
+.niveau-S{background:var(--niveau-satisfaisant);}
+.niveau-T{background:#2563eb;}
+.niveau-abs{background:#94a3b8;}
+.note-badge{display:inline-block;padding:1px 7px;border-radius:999px;background:#1e293b;color:#fff;font-weight:700;font-size:.7rem;margin-left:3px;}
+.sexe-icon{font-weight:900;font-size:1rem;}
+.sexe-icon.sexe-F{color:var(--fille);}
+.sexe-icon.sexe-M{color:var(--garcon);}
+.compact th,.compact td{padding:4px 6px;font-size:.78rem;}
+#resultatsTable thead th,.stat-table thead th{position:static;}
+.reset-icon{background:none;border:none;cursor:pointer;font-size:.85rem;padding:0 4px;min-height:auto;color:var(--muted);}
+.reset-icon:hover{color:var(--primary-dark);}
+.rank-line{white-space:nowrap;line-height:1.3;}
+.rank-line-sexe{color:var(--muted);font-size:.85em;}
+.btn-xl{font-size:1.3rem;padding:18px 32px;min-height:64px;border-radius:14px;}
+.dc-tile{
+  display:inline-block;padding:8px 14px;border-radius:10px;
+  background:var(--primary);color:#fff;font-weight:800;font-size:.95rem;
+  box-shadow:0 2px 4px rgba(37,99,235,.4);
+}
+.dc-tile:active{background:var(--primary-dark);}
+.medal{font-size:1.1rem;margin-right:4px;}
+.ll-columns{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:820px){.ll-columns{grid-template-columns:1fr;}}
+.ll-live{
+  font-size:1rem;font-weight:700;background:#0f172a;color:#fff;
+  padding:10px 14px;border-radius:10px;display:inline-block;
+}
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(15,23,42,.55);
+  display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;
+}
+.modal-overlay.hidden{display:none;}
+.hidden{display:none;}
+.modal{background:#fff;border-radius:14px;padding:22px;max-width:480px;width:100%;}
+.import-class-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.import-class-grid button{width:100%;}
+.import-status{min-height:24px;font-size:.85rem;color:var(--muted);}
+.chrono-display{
+  font-size:2.4rem;font-weight:800;font-variant-numeric:tabular-nums;
+  background:#0f172a;color:#fff;border-radius:12px;padding:14px 22px;display:inline-block;
+}
+.help-text{font-size:.78rem;color:var(--muted);margin-top:4px;}
+.stat-table th.garcon-head{background:var(--garcon);}
+.stat-table th.fille-head{background:var(--fille);}
+.stat-table td.garcon-cell{background:#eff6ff;}
+.stat-table td.fille-cell{background:#fdf2f8;}
+.sort-arrow{font-size:.7rem;opacity:.8;}
+.absent-checkbox{transform:scale(1.3);margin-right:4px;}
+footer.app-footer{text-align:center;color:var(--muted);font-size:.78rem;padding:20px;}
+@media(max-width:600px){
+  header.app-header h1{font-size:1.1rem;}
+  .import-class-grid{grid-template-columns:1fr;}
+  .chrono-display{font-size:1.8rem;}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="row-flex" style="justify-content:space-between;">
+    <div>
+      <h1>EPS Joliot Curie - Tests Physiques</h1>
+      <p>Suivi des tests physiques 6ème à 3ème : endurance, vitesse, force</p>
+    </div>
+    <div id="globalSyncBar" class="row-flex hidden">
+      <button class="btn-secondary" onclick="synchroniserTout()">🔄 Synchroniser</button>
+      <span id="global-sync-status" style="color:#fff;opacity:.9;font-size:.8rem;"></span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" id="mainTabs"></nav>
+
+<main id="mainContent">
+  <section id="tab-resultats" class="tab-panel">
+    <div class="card">
+      <div class="row-flex" style="justify-content:space-between;">
+        <h2>📊 Résultats</h2>
+        <div class="row-flex">
+          <label>Classe :
+            <select id="resultatsClasseSelect" onchange="renderResultats()"></select>
+          </label>
+          <button class="btn-success" onclick="exportExcel()">⬇️ Exporter en Excel</button>
+        </div>
+      </div>
+      <div class="table-wrapper">
+        <table id="resultatsTable" class="compact"></table>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-statistiques" class="tab-panel">
+    <div class="card">
+      <div class="row-flex" style="justify-content:space-between;">
+        <h2>📈 Statistiques</h2>
+        <label>Classe :
+          <select id="statsClasseSelect" onchange="renderStatistiques()"></select>
+        </label>
+      </div>
+      <div id="statsContent"></div>
+    </div>
+  </section>
+</main>
+
+<audio id="audioLL" src="assets/25QP61_bande_son_test_endurance.mp3" preload="auto"></audio>
+
+<div id="importModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Importer une classe</h2>
+    <p>Les classes sont vérifiées automatiquement depuis le Google Sheet du collège. Les classes marquées 🆕 n'ont pas encore été importées.</p>
+    <div class="import-class-grid" id="importClassButtons"></div>
+    <p class="import-status" id="importStatus"></p>
+    <p class="help-text"><a href="https://docs.google.com/spreadsheets/d/10tVQpcayUlpOwg92iSpWciAQqtZR65gKDVW3QissGwg/edit?gid=954837618#gid=954837618" target="_blank" rel="noopener">Ouvrir le Google Sheet dans un nouvel onglet</a></p>
+    <button class="btn-secondary" onclick="closeImportModal()">Fermer</button>
+  </div>
+</div>
+
+<footer class="app-footer">Collège Joliot Curie — Outil de suivi des tests physiques</footer>
+
+<script>
+/* ===================== CONSTANTES ===================== */
+const SHEET_ID = "10tVQpcayUlpOwg92iSpWciAQqtZR65gKDVW3QissGwg";
+const SHEET_GID = "954837618";
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${SHEET_GID}`;
+const BAREME_GIDS = { '6eme':'705116735', '5eme':'120996016', '4eme3eme':'1231103491' };
+function baremeUrl(niveau){ return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${BAREME_GIDS[niveau]}`; }
+const STORAGE_KEY = "epsJoliotCurie_testsPhysiques_v1";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxhPLF5160Lb5vv0BV8v9A6aq7t_7ttNXoysrd5ddO5132f995C1IJkCm3UM-4zkcMu/exec";
+
+function getNiveau(classe){
+  const m = (classe||'').match(/(\d)/);
+  if(!m) return '6eme';
+  const d = m[1];
+  if(d==='6') return '6eme';
+  if(d==='5') return '5eme';
+  if(d==='4'||d==='3') return '4eme3eme';
+  return '6eme';
+}
+
+/* ===================== ETAT ===================== */
+let STATE = { classes:{}, order:[] };
+let liveTimer = null;
+
+/* ===================== UTILITAIRES ===================== */
+function uid(){ return 'id'+Math.random().toString(36).slice(2)+Date.now().toString(36); }
+function qs(sel,root){ return (root||document).querySelector(sel); }
+function qsa(sel,root){ return Array.from((root||document).querySelectorAll(sel)); }
+function escapeHtml(s){ return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function slug(s){ return s.normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-zA-Z0-9]/g,''); }
+function normalizeHeader(h){ return h.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim(); }
+function normalizeClasse(v){ return v.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]/g,''); }
+function capitalize(str){
+  return str.toLowerCase().replace(/(^|[\s-])(\p{L})/gu, (m,p1,p2)=>p1+p2.toUpperCase());
+}
+function formatMMSS(sec){
+  if(sec===null||sec===undefined||isNaN(sec)) return '--:--';
+  const m = Math.floor(sec/60), s = Math.floor(sec%60);
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function saveState(){
+  const toSave = { classes:{}, order:STATE.order };
+  for(const c of STATE.order){
+    const cl = STATE.classes[c];
+    toSave.classes[c] = { students:cl.students, testMode:cl.testMode, activeGroup:cl.activeGroup };
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+}
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(!raw) return;
+  try{
+    const data = JSON.parse(raw);
+    STATE.order = data.order||[];
+    STATE.classes = {};
+    for(const c of STATE.order){
+      const cl = data.classes[c];
+      STATE.classes[c] = { students:cl.students||[], testMode:cl.testMode||null, activeGroup:cl.activeGroup||'A', runState:{running:false} };
+    }
+  }catch(e){ console.warn('Etat local illisible', e); }
+}
+
+/* ===================== CSV PARSER ===================== */
+function parseCSV(text){
+  const rows=[]; let row=[]; let field=''; let inQuotes=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(inQuotes){
+      if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else { inQuotes=false; } }
+      else field+=c;
+    } else {
+      if(c==='"') inQuotes=true;
+      else if(c===','){ row.push(field); field=''; }
+      else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+      else if(c==='\r'){ /* skip */ }
+      else field+=c;
+    }
+  }
+  if(field.length>0 || row.length>0){ row.push(field); rows.push(row); }
+  return rows;
+}
+
+/* ===================== PALIERS LUC LEGER ===================== */
+function buildPalierSchedule(){
+  const schedule = [{palier:0, debut:0, duree:120, vitesse:7.5}];
+  let start = 120;
+  for(let p=1;p<=30;p++){
+    schedule.push({palier:p, debut:start, duree:60, vitesse: Math.round((7.5+0.5*p)*10)/10});
+    start += 60;
+  }
+  return schedule;
+}
+const PALIER_SCHEDULE = buildPalierSchedule();
+function getPalierIndexAt(elapsedSec){
+  let idx = PALIER_SCHEDULE.findIndex(p=> elapsedSec >= p.debut && elapsedSec < p.debut+p.duree);
+  if(idx===-1) idx = PALIER_SCHEDULE.length-1;
+  return idx;
+}
+function computeResultatLucLeger(elapsedSec){
+  const idx = getPalierIndexAt(elapsedSec);
+  const p = PALIER_SCHEDULE[idx];
+  const intoPalier = elapsedSec - p.debut;
+  const half = p.duree/2;
+  let result;
+  if(idx===0 || intoPalier>=half){
+    result = {palier:p.palier, vitesse:p.vitesse};
+  } else {
+    const prev = PALIER_SCHEDULE[idx-1];
+    result = {palier:prev.palier, vitesse:prev.vitesse};
+  }
+  return {...result, temps: elapsedSec};
+}
+
+/* ===================== NIVEAUX (BAREMES) ===================== */
+function niveauLucLeger(vitesse){
+  if(vitesse < 9) return 'A besoins';
+  if(vitesse < 10) return 'Fragile';
+  return 'Satisfaisant';
+}
+function niveauLongueur(cm){
+  if(cm <= 110) return 'A besoins';
+  if(cm <= 140) return 'Fragile';
+  return 'Satisfaisant';
+}
+function niveauVitesse(sec){
+  if(sec >= 6.8) return 'A besoins';
+  if(sec >= 6) return 'Fragile';
+  return 'Satisfaisant';
+}
+function niveauClass(niveau){
+  if(niveau==='A besoins') return 'niveau-A';
+  if(niveau==='Fragile') return 'niveau-F';
+  if(niveau==='Satisfaisant') return 'niveau-S';
+  if(niveau==='Très bon niveau') return 'niveau-T';
+  return 'niveau-abs';
+}
+function notePill(note){
+  if(note==null || isNaN(note)) return '';
+  return `<span class="note-badge">${note}/20</span>`;
+}
+function bgLight(colorVar){ return `background:var(${colorVar}-light);`; }
+function sexeIcon(sexe){
+  return sexe==='F' ? `<span class="sexe-icon sexe-F" title="Fille">♀</span>` : `<span class="sexe-icon sexe-M" title="Garçon">♂</span>`;
+}
+function clearResult(student, testKey){
+  // Marqueur non-null distinct de "jamais testé" : une synchronisation ne doit
+  // jamais réinterpréter un effacement volontaire comme une simple case vide
+  // à recompléter depuis le Sheet (sinon l'ancienne valeur serait restaurée).
+  student.results[testKey] = {cleared:true};
+}
+function resetResult(classe, studentId, testKey){
+  const s = STATE.classes[classe].students.find(x=>x.id===studentId);
+  if(!s) return;
+  if(!confirm('Effacer ce résultat pour le recommencer ?')) return;
+  clearResult(s, testKey);
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe, true);
+}
+function resetBtn(classe, studentId, testKey){
+  return `<button class="reset-icon" onclick="event.stopPropagation();resetResult('${escapeHtml(classe)}','${studentId}','${testKey}')" title="Recommencer">↺</button>`;
+}
+function rankGenCell(ranks, studentId){
+  const rg = ranks.gen[studentId];
+  return rg!=null ? `${medalFor(rg)}${rg}` : '—';
+}
+function rankSexeCell(ranks, studentId, sexe){
+  const rs = sexe==='F' ? ranks.F[studentId] : ranks.M[studentId];
+  return rs!=null ? `${medalFor(rs)}${rs}` : '—';
+}
+function twoColumnBlocks(theadHtml, rowsArr, colspan){
+  if(rowsArr.length===0) return `<div class="table-wrapper"><table>${theadHtml}<tbody><tr><td colspan="${colspan}">Aucun élève</td></tr></tbody></table></div>`;
+  const half = Math.ceil(rowsArr.length/2);
+  const col1 = rowsArr.slice(0,half).join('');
+  const col2 = rowsArr.slice(half).join('');
+  const block = rowsHtml => `<div class="table-wrapper compact"><table>${theadHtml}<tbody>${rowsHtml}</tbody></table></div>`;
+  return `<div class="ll-columns">${block(col1)}${col2?block(col2):''}</div>`;
+}
+function niveauPill(niveau){
+  if(!niveau) return '<span class="niveau-pill niveau-abs">Absent</span>';
+  return `<span class="niveau-pill ${niveauClass(niveau)}">${niveau}</span>`;
+}
+function niveauFromNote(note){
+  if(note==null || isNaN(note)) return null;
+  if(note<=6) return 'A besoins';
+  if(note<=11) return 'Fragile';
+  if(note<=16) return 'Satisfaisant';
+  return 'Très bon niveau';
+}
+
+/* ===================== BAREME (notes /20 depuis le Google Sheet) ===================== */
+const BAREME_COLUMNS = {
+  '6eme': {
+    endurance:       {raw:1,  g:2,  f:3,  higherIsBetter:true},
+    vitesse:         {raw:6,  g:7,  f:8,  higherIsBetter:false},
+    longueur:        {raw:9,  g:10, f:11, higherIsBetter:true},
+    detenteVerticale:{raw:12, g:13, f:14, higherIsBetter:true},
+    pompes:          {raw:15, g:16, f:17, higherIsBetter:true},
+    souplesse:       {raw:19, g:20, f:21, higherIsBetter:true}
+  },
+  '5eme': {
+    endurance:          {raw:1,  g:2,  f:3,  higherIsBetter:true},
+    vitesse:            {raw:4,  g:5,  f:6,  higherIsBetter:false},
+    detenteHorizontale: {raw:7,  g:8,  f:9,  higherIsBetter:true},
+    detenteVerticale:   {raw:10, g:11, f:12, higherIsBetter:true},
+    pompes:             {raw:13, g:14, f:15, higherIsBetter:true},
+    souplesse:          {raw:17, g:18, f:19, higherIsBetter:true}
+  },
+  '4eme3eme': {
+    endurance:          {raw:1,  g:2,  f:3,  higherIsBetter:true},
+    vitesse:            {raw:4,  g:5,  f:6,  higherIsBetter:false},
+    detenteHorizontale: {raw:7,  g:8,  f:9,  higherIsBetter:true},
+    detenteVerticale:   {raw:10, g:11, f:12, higherIsBetter:true},
+    pompes:             {raw:13, g:14, f:15, higherIsBetter:true},
+    souplesse:          {raw:17, g:18, f:19, higherIsBetter:true}
+  }
+};
+function parseFrNumber(s){
+  if(s==null) return NaN;
+  return parseFloat(String(s).trim().replace(',','.'));
+}
+function parseBaremeColumn(rows, colConfig){
+  const table = [];
+  let started = false;
+  for(const r of rows){
+    const raw = parseFrNumber(r[colConfig.raw]);
+    if(isNaN(raw)){
+      if(started) break;
+      continue;
+    }
+    started = true;
+    const g = parseFrNumber(r[colConfig.g]);
+    const f = parseFrNumber(r[colConfig.f]);
+    table.push({ raw, garcons: isNaN(g)?null:g, filles: isNaN(f)?null:f });
+  }
+  return table;
+}
+function lookupNote(table, valeur, sexe, higherIsBetter){
+  if(!table || table.length===0 || valeur==null || isNaN(valeur)) return null;
+  const key = sexe==='F' ? 'filles' : 'garcons';
+  if(higherIsBetter){
+    let best = null;
+    for(const row of table){ if(row.raw<=valeur) best = row; else break; }
+    if(!best) return table[0][key];
+    return best[key];
+  } else {
+    for(const row of table){ if(row.raw>=valeur) return row[key]; }
+    return table[table.length-1][key];
+  }
+}
+let syncTimers = {};
+function syncToSheet(classe, skipPull){
+  if(!APPS_SCRIPT_URL) return;
+  if(syncTimers[classe]) clearTimeout(syncTimers[classe]);
+  syncTimers[classe] = setTimeout(()=>doSyncToSheet(classe, skipPull), 1200);
+}
+async function doSyncToSheet(classe, skipPull){
+  if(!APPS_SCRIPT_URL || !STATE.classes[classe]) return;
+  setSyncStatus(classe, 'Synchronisation en cours...');
+  try{
+    // On récupère d'abord ce qui existe déjà sur le Sheet (fusion additive, sans jamais
+    // écraser une donnée locale déjà présente) avant d'envoyer, pour ne jamais régresser
+    // les résultats d'un autre appareil que cet appareil n'a pas encore en local.
+    // Exception : après un "recommencer" explicite, on saute cette étape (skipPull) pour
+    // que la remise à zéro voulue par l'utilisateur s'envoie vraiment, sans être restaurée.
+    if(!skipPull) await fetchAndMergeResultsFromSheet(classe);
+    const cl = STATE.classes[classe];
+    const columns = buildResultColumns(getNiveau(classe));
+    const rows = buildResultRows(classe).sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+    const payload = {
+      classe,
+      header: [...columns.map(c=>c.label), 'DonneesBrutes'],
+      rows: rows.map(r=>{
+        const vals = columns.map(c=>{
+          const v = r[c.key];
+          return (v===undefined||v===null) ? '' : v;
+        });
+        const student = cl.students.find(s=>s.nomPrenom===r.nomPrenom && s.sexe===r.sexe);
+        vals.push(JSON.stringify(student ? student.results : {}));
+        return vals;
+      })
+    };
+    await fetch(APPS_SCRIPT_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify(payload)
+    });
+    renderClassTab(classe);
+    setSyncStatus(classe, 'Dernière synchro : '+new Date().toLocaleTimeString('fr-FR'));
+  }catch(err){
+    console.warn('Synchro Google Sheet impossible', err);
+    setSyncStatus(classe, 'Synchro hors ligne (résultats conservés localement)');
+  }
+}
+function normalizeLegacyResults(results){
+  if(!results) return results;
+  ['longueur','detenteHorizontale'].forEach(testKey=>{
+    const r = results[testKey];
+    if(r && r.valeur==null && r.distance!=null){
+      r.valeur = r.distance;
+      delete r.distance;
+    }
+  });
+  return results;
+}
+async function fetchAndMergeResultsFromSheet(classe){
+  const cl = STATE.classes[classe];
+  if(!cl) return {ok:false, error:'Classe inconnue'};
+  const res = await fetch(`${APPS_SCRIPT_URL}?classe=${encodeURIComponent(classe)}`, {cache:'no-store'});
+  if(!res.ok) return {ok:false, error:'HTTP '+res.status};
+  const data = await res.json();
+  if(!data.ok) return {ok:false, error:data.error||'Erreur inconnue'};
+  if(!data.header || data.header.length===0) return {ok:true, count:0};
+  const idxNom = data.header.indexOf('Nom Prénom');
+  const idxSexe = data.header.indexOf('Sexe');
+  const idxRaw = data.header.indexOf('DonneesBrutes');
+  if(idxNom===-1 || idxRaw===-1) return {ok:false, error:'Colonnes attendues introuvables (le script Apps Script a-t-il été redéployé ?).'};
+  let count = 0;
+  data.rows.forEach(row=>{
+    const nomPrenom = row[idxNom];
+    const sexe = idxSexe!==-1 ? row[idxSexe] : null;
+    const student = cl.students.find(s=>s.nomPrenom===nomPrenom && (sexe==null || s.sexe===sexe));
+    if(student && row[idxRaw]){
+      try{
+        const incoming = normalizeLegacyResults(JSON.parse(row[idxRaw]));
+        if(!student.results) student.results = {};
+        let changed = false;
+        Object.keys(incoming||{}).forEach(testKey=>{
+          const localVal = student.results[testKey];
+          const isLocalEmpty = localVal===undefined || localVal===null;
+          if(isLocalEmpty && incoming[testKey]!=null){
+            student.results[testKey] = incoming[testKey];
+            changed = true;
+          }
+        });
+        if(changed) count++;
+      }catch(e){ /* ligne illisible, ignorée */ }
+    }
+  });
+  saveState();
+  return {ok:true, count};
+}
+async function autoLoadAllFromSheet(){
+  if(!APPS_SCRIPT_URL) return;
+  for(const classe of STATE.order){
+    try{
+      const {ok} = await fetchAndMergeResultsFromSheet(classe);
+      if(ok) renderClassTab(classe);
+    }catch(err){
+      console.warn('Auto-chargement depuis le Sheet impossible pour', classe, err);
+    }
+  }
+}
+async function synchroniserTout(){
+  if(!APPS_SCRIPT_URL) return;
+  setSyncStatus(null, 'Synchronisation en cours...');
+  let nbErreurs = 0;
+  for(const classe of STATE.order){
+    try{
+      await doSyncToSheet(classe); // pull-merge puis push, en interne
+    }catch(err){
+      console.warn('Synchronisation impossible pour', classe, err);
+      nbErreurs++;
+    }
+  }
+  setSyncStatus(null, nbErreurs===0
+    ? 'Tout est synchronisé (' + new Date().toLocaleTimeString('fr-FR') + ')'
+    : `Synchronisé avec ${nbErreurs} erreur(s) — vérifiez la connexion.`);
+}
+function setSyncStatus(classe, text){
+  const el = document.getElementById('global-sync-status');
+  if(el) el.textContent = text;
+}
+let baremeCache = {};
+async function getBareme(niveau){
+  if(baremeCache[niveau]) return baremeCache[niveau];
+  const res = await fetch(baremeUrl(niveau), {cache:'no-store'});
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const text = await res.text();
+  const rows = parseCSV(text);
+  const tables = {};
+  for(const [testKey, colConfig] of Object.entries(BAREME_COLUMNS[niveau])){
+    tables[testKey] = { ...colConfig, table: parseBaremeColumn(rows, colConfig) };
+  }
+  baremeCache[niveau] = tables;
+  return tables;
+}
+async function computeNote(classe, testKey, valeur, sexe){
+  try{
+    const niveau = getNiveau(classe);
+    const bareme = await getBareme(niveau);
+    const conf = bareme[testKey];
+    if(!conf) return null;
+    return lookupNote(conf.table, valeur, sexe, conf.higherIsBetter);
+  }catch(err){
+    console.warn('Barème indisponible pour', testKey, err);
+    return null;
+  }
+}
+
+/* ===================== IMPORT ===================== */
+let pendingImportRows = null;
+let pendingImportHeaderIdx = null;
+
+async function openImportModal(){
+  pendingImportRows = null;
+  pendingImportHeaderIdx = null;
+  qs('#importClassButtons').innerHTML='';
+  const statusEl = qs('#importStatus');
+  statusEl.textContent = 'Vérification des classes disponibles depuis le Google Sheet...';
+  qs('#importModal').classList.remove('hidden');
+  try{
+    const res = await fetch(CSV_URL, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if(rows.length<2) throw new Error('Le fichier semble vide.');
+    pendingImportHeaderIdx = parseHeaderIndices(rows);
+    pendingImportRows = rows;
+    statusEl.textContent = '';
+    renderImportClassButtons();
+  }catch(err){
+    statusEl.textContent = "Erreur : "+err.message+" — Vérifiez votre connexion internet et le partage du Google Sheet.";
+  }
+}
+function closeImportModal(){ qs('#importModal').classList.add('hidden'); }
+
+function parseHeaderIndices(rows){
+  const header = rows[0].map(normalizeHeader);
+  const idxNom = header.findIndex(h=>h==='nom');
+  const idxPrenom = header.findIndex(h=>h==='prenom');
+  const idxClasse = header.findIndex(h=>h==='classe');
+  const idxSexe = header.findIndex(h=>h==='sexe'||h==='genre');
+  if(idxNom===-1||idxPrenom===-1||idxClasse===-1||idxSexe===-1){
+    throw new Error('Colonnes introuvables. Le fichier doit contenir : Nom, Prénom, Classe, Sexe.');
+  }
+  return {idxNom, idxPrenom, idxClasse, idxSexe};
+}
+function buildStudentsFromRows(rows, classeCible, idx){
+  const targetNorm = normalizeClasse(classeCible);
+  const students = [];
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r || r.every(c=>!c || !c.trim())) continue;
+    const classeVal = (r[idx.idxClasse]||'').trim();
+    if(normalizeClasse(classeVal)!==targetNorm) continue;
+    const nom = (r[idx.idxNom]||'').trim();
+    const prenom = (r[idx.idxPrenom]||'').trim();
+    if(!nom && !prenom) continue;
+    const sexeRaw = (r[idx.idxSexe]||'').trim().toUpperCase();
+    const sexe = sexeRaw.startsWith('F') ? 'F' : 'M';
+    students.push({
+      id: uid(),
+      nom, prenom,
+      nomPrenom: (nom.toUpperCase()+' '+capitalize(prenom)).trim(),
+      classe: classeCible,
+      sexe,
+      group: null,
+      results: {}
+    });
+  }
+  students.sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  assignGroups(students);
+  return students;
+}
+function discoverClasses(rows, idx){
+  const seen = new Map();
+  for(let i=1;i<rows.length;i++){
+    const r = rows[i];
+    if(!r) continue;
+    const classeVal = (r[idx.idxClasse]||'').trim();
+    if(!classeVal) continue;
+    const norm = normalizeClasse(classeVal);
+    if(!seen.has(norm)) seen.set(norm, classeVal);
+  }
+  return Array.from(seen.values()).sort((a,b)=>a.localeCompare(b,'fr'));
+}
+function renderImportClassButtons(){
+  const container = qs('#importClassButtons');
+  container.innerHTML='';
+  const classesTrouvees = discoverClasses(pendingImportRows, pendingImportHeaderIdx);
+  if(classesTrouvees.length===0){
+    container.innerHTML = '<p>Aucune classe trouvée dans la colonne "Classe" du Google Sheet.</p>';
+    return;
+  }
+  classesTrouvees.forEach(c=>{
+    const dejaImportee = !!STATE.classes[c];
+    const nb = buildStudentsFromRows(pendingImportRows, c, pendingImportHeaderIdx).length;
+    const btn = document.createElement('button');
+    if(dejaImportee){
+      btn.className = 'btn-secondary';
+      btn.textContent = `${c} — déjà importée (ré-importer, ${nb} élève(s))`;
+      btn.onclick = ()=>importerClasseDepuisSheet(c);
+    } else {
+      btn.className = 'btn-primary';
+      btn.textContent = `🆕 ${c} — ${nb} élève(s) à importer`;
+      btn.onclick = ()=>importerClasseDepuisSheet(c);
+    }
+    container.appendChild(btn);
+  });
+}
+function finalizeImport(classeCible, students){
+  const existing = STATE.classes[classeCible];
+  STATE.classes[classeCible] = existing
+    ? { ...existing, students }
+    : { students, testMode:null, activeGroup:'A', runState:{running:false} };
+  if(!STATE.order.includes(classeCible)) STATE.order.push(classeCible);
+  saveState();
+  renderMainTabs();
+  renderClassTab(classeCible);
+  switchTab('classe-'+slug(classeCible));
+  closeImportModal();
+  if(APPS_SCRIPT_URL){
+    fetchAndMergeResultsFromSheet(classeCible).then(({ok})=>{
+      if(ok){
+        renderClassTab(classeCible);
+        setSyncStatus(classeCible, 'Résultats existants chargés automatiquement depuis le Sheet.');
+      }
+    }).catch(err=>console.warn('Auto-chargement après import impossible', err));
+  }
+}
+function mergeStudents(existingStudents, newStudents){
+  const existingByKey = new Map(existingStudents.map(s=>[s.nomPrenom+'|'+s.sexe, s]));
+  return newStudents.map(ns=>{
+    const key = ns.nomPrenom+'|'+ns.sexe;
+    const existing = existingByKey.get(key);
+    if(existing) return { ...existing, classe: ns.classe };
+    return { ...ns, group: null };
+  });
+}
+function assignGroupsToNewStudents(students){
+  let countA = students.filter(s=>s.group==='A').length;
+  let countB = students.filter(s=>s.group==='B').length;
+  students.forEach(s=>{
+    if(!s.group){
+      if(countA<=countB){ s.group='A'; countA++; } else { s.group='B'; countB++; }
+    }
+  });
+}
+function importerClasseDepuisSheet(classeCible){
+  if(!pendingImportRows) return;
+  const existing = STATE.classes[classeCible];
+  const newStudents = buildStudentsFromRows(pendingImportRows, classeCible, pendingImportHeaderIdx);
+  let finalStudents;
+  if(existing){
+    const nbAvant = existing.students.length;
+    finalStudents = mergeStudents(existing.students, newStudents);
+    assignGroupsToNewStudents(finalStudents);
+    finalStudents.sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+    const nbNouveaux = finalStudents.length - nbAvant;
+    if(nbNouveaux>0 && !confirm(`${nbNouveaux} nouvel(aux) élève(s) seront ajouté(s) à ${classeCible}. Les élèves déjà présents conservent leurs résultats. Continuer ?`)) return;
+  } else {
+    finalStudents = newStudents;
+  }
+  finalizeImport(classeCible, finalStudents);
+}
+function assignGroups(students){
+  const half = Math.ceil(students.length/2);
+  students.forEach((s,i)=>{ s.group = i<half?'A':'B'; });
+}
+
+/* ===================== NAVIGATION ONGLETS ===================== */
+function renderMainTabs(){
+  const nav = qs('#mainTabs');
+  nav.innerHTML='';
+  STATE.order.forEach(classe=>{
+    const btn = document.createElement('button');
+    btn.className='tab-btn';
+    btn.dataset.tab = 'classe-'+slug(classe);
+    btn.textContent = classe;
+    btn.onclick = ()=>switchTab('classe-'+slug(classe));
+    nav.appendChild(btn);
+  });
+  const addBtn = document.createElement('button');
+  addBtn.className='tab-btn tab-add';
+  addBtn.textContent='+ Importer une classe';
+  addBtn.onclick = openImportModal;
+  nav.appendChild(addBtn);
+
+  const resBtn = document.createElement('button');
+  resBtn.className='tab-btn'; resBtn.dataset.tab='resultats';
+  resBtn.textContent='📊 Résultats';
+  resBtn.onclick=()=>switchTab('resultats');
+  nav.appendChild(resBtn);
+
+  const statBtn = document.createElement('button');
+  statBtn.className='tab-btn'; statBtn.dataset.tab='statistiques';
+  statBtn.textContent='📈 Statistiques';
+  statBtn.onclick=()=>switchTab('statistiques');
+  nav.appendChild(statBtn);
+
+  // s'assurer que les panneaux de classe existent
+  STATE.order.forEach(classe=>{
+    const id='tab-classe-'+slug(classe);
+    if(!document.getElementById(id)){
+      const section = document.createElement('section');
+      section.id = id;
+      section.className='tab-panel';
+      qs('#mainContent').insertBefore(section, qs('#tab-resultats'));
+    }
+  });
+  updateClasseSelects();
+}
+function switchTab(tabId){
+  qsa('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===tabId));
+  qsa('.tab-panel').forEach(p=>p.classList.toggle('active', p.id==='tab-'+tabId));
+  if(tabId==='resultats') renderResultats();
+  if(tabId==='statistiques') renderStatistiques();
+}
+function updateClasseSelects(){
+  ['resultatsClasseSelect','statsClasseSelect'].forEach(id=>{
+    const sel = qs('#'+id);
+    const prev = sel.value;
+    sel.innerHTML = STATE.order.map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
+    if(STATE.order.includes(prev)) sel.value = prev;
+  });
+}
+
+const TEST_OPTIONS = {
+  '6eme': [
+    {value:'lucLeger', label:'🏃 Endurance (Luc Léger)'},
+    {value:'longueur', label:'🦘 Test de longueur'},
+    {value:'vitesse', label:'⚡ Vitesse (30m)'},
+    {value:'detenteVerticale', label:'⬆️ Détente verticale'},
+    {value:'souplesse', label:'🤸 Souplesse'},
+    {value:'pompes', label:'💪 Force des bras (Pompes)'}
+  ],
+  '5eme': [
+    {value:'demiCooper', label:'🏃 Endurance (Demi-Cooper 6mn)'},
+    {value:'vitesse40', label:'⚡ Vitesse (40m)'},
+    {value:'detenteHorizontale', label:'🦘 Détente horizontale'},
+    {value:'detenteVerticale', label:'⬆️ Détente verticale'},
+    {value:'souplesse', label:'🤸 Souplesse'},
+    {value:'pompes', label:'💪 Force des bras (Pompes)'}
+  ]
+};
+TEST_OPTIONS['4eme3eme'] = TEST_OPTIONS['5eme'];
+const GROUP_TESTS = ['lucLeger','demiCooper'];
+
+/* ===================== RENDU ONGLET CLASSE ===================== */
+function renderClassTab(classe){
+  const cl = STATE.classes[classe];
+  const panel = document.getElementById('tab-classe-'+slug(classe));
+  if(!panel) return;
+  const niveau = getNiveau(classe);
+  const nbA = cl.students.filter(s=>s.group==='A').length;
+  const nbB = cl.students.filter(s=>s.group==='B').length;
+  const options = TEST_OPTIONS[niveau];
+  panel.innerHTML = `
+    <div class="card">
+      <div class="row-flex" style="justify-content:space-between;">
+        <h2>${escapeHtml(classe)} — ${cl.students.length} élève(s)</h2>
+        <div class="row-flex">
+          <label>Test :
+            <select onchange="setTestMode('${escapeHtml(classe)}', this.value)">
+              <option value="">-- Choisir --</option>
+              ${options.map(o=>`<option value="${o.value}" ${cl.testMode===o.value?'selected':''}>${o.label}</option>`).join('')}
+            </select>
+          </label>
+          ${cl.testMode ? `<button class="btn-danger" onclick="resetAllResultsForTest('${escapeHtml(classe)}','${cl.testMode}')">🗑️ Réinitialiser ce test</button>` : ''}
+        </div>
+      </div>
+      ${GROUP_TESTS.includes(cl.testMode) ? `<div class="row-flex"><span class="badge groupA">Groupe A : ${nbA} élève(s)</span><span class="badge groupB">Groupe B : ${nbB} élève(s)</span></div>` : ''}
+    </div>
+    <div id="testContent-${slug(classe)}"></div>
+  `;
+  if(cl.testMode==='lucLeger') renderLucLeger(classe);
+  else if(SIMPLE_TEST_CONFIG[cl.testMode]) renderSimpleNumericTest(classe, cl.testMode);
+  else if(cl.testMode==='vitesse') renderVitesse(classe);
+  else if(cl.testMode==='souplesse') renderSouplesse(classe);
+  else if(cl.testMode==='demiCooper') renderDemiCooper(classe);
+  else if(cl.testMode==='vitesse40') renderVitesse40(classe);
+}
+function setTestMode(classe, mode){
+  STATE.classes[classe].testMode = mode || null;
+  saveState();
+  renderClassTab(classe);
+}
+function resetAllResultsForTest(classe, testKey){
+  const def = TEST_DEFS[testKey];
+  const label = def ? def.label : testKey;
+  if(!confirm(`Réinitialiser TOUS les résultats de « ${label} » pour la classe ${classe} ? Cette action est irréversible.`)) return;
+  const cl = STATE.classes[classe];
+  cl.students.forEach(s=>{ clearResult(s, testKey); });
+  if(testKey==='lucLeger' || testKey==='demiCooper'){
+    cl.runState = {running:false};
+    if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
+  }
+  if(testKey==='vitesse' && vitesseChrono.classe===classe){
+    if(vitesseChrono.interval) clearInterval(vitesseChrono.interval);
+    vitesseChrono = {classe:null, studentIdx:null, startTs:null, interval:null};
+  }
+  if(testKey==='vitesse40' && vitesse40Heat.classe===classe){
+    vitesse40Heat = {classe:null, running:false, startTs:null, stamps:[], assignedCount:0};
+  }
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe, true);
+}
+
+/* ===================== LUC LEGER ===================== */
+function getAudio(){ return qs('#audioLL'); }
+function renderLucLeger(classe){
+  const cl = STATE.classes[classe];
+  const container = qs('#testContent-'+slug(classe));
+  const running = cl.runState.running;
+  container.innerHTML = `
+    <div class="card">
+      <div class="row-flex">
+        <label>Groupe qui commence :
+          <select id="startGroupSelect-${slug(classe)}" ${running?'disabled':''} onchange="STATE.classes['${escapeHtml(classe)}'].activeGroup=this.value; saveState(); renderClassTab('${escapeHtml(classe)}')">
+            <option value="A" ${cl.activeGroup==='A'?'selected':''}>Groupe A</option>
+            <option value="B" ${cl.activeGroup==='B'?'selected':''}>Groupe B</option>
+          </select>
+        </label>
+        ${!running
+          ? `<button class="btn-primary" onclick="departCommun('${escapeHtml(classe)}')">▶️ Départ commun (Groupe ${cl.activeGroup})</button>`
+          : `<button class="btn-danger" onclick="stopDepart('${escapeHtml(classe)}')">⏹️ Arrêter</button>`}
+        <span class="ll-live" id="liveDisplay-${slug(classe)}">Palier -- | -- km/h | --:--</span>
+      </div>
+      <p class="help-text">Cliquez sur un élève du groupe actif pendant la course pour enregistrer sa performance. Le son s'arrête automatiquement quand tous les élèves du groupe ont été enregistrés (ou marqués absents).</p>
+    </div>
+    <div class="ll-columns">
+      ${renderLLGroupColumn(classe,'A',computeTestRanks(classe,'lucLeger'))}
+      ${renderLLGroupColumn(classe,'B',computeTestRanks(classe,'lucLeger'))}
+    </div>
+    <div class="card">${classAverageHtml(classe, 'lucLeger')}</div>
+  `;
+  if(running) updateLiveDisplay(classe);
+}
+function renderLLGroupColumn(classe, group, ranks){
+  const cl = STATE.classes[classe];
+  const students = cl.students.filter(s=>s.group===group).sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const isActive = cl.activeGroup===group && cl.runState.running;
+  const rows = students.map(s=>{
+    const r = s.results.lucLeger;
+    const done = r && (r.done || r.absent);
+    const rowClass = r && r.absent ? 'row-absent' : (r && r.done ? 'row-done':'');
+    const clickable = isActive && !done;
+    let resultCell, niveau=null;
+    if(r && r.done){
+      niveau = niveauLucLeger(r.vitesse);
+      resultCell = `
+        <select onclick="event.stopPropagation()" onchange="editLucLegerPalier('${escapeHtml(classe)}','${s.id}',this.value)">
+          ${PALIER_SCHEDULE.map(p=>`<option value="${p.palier}" ${r.palier===p.palier?'selected':''}>Palier ${p.palier}</option>`).join('')}
+        </select>
+        <input type="number" step="1" value="${Math.round(r.temps)}" style="width:50px" onclick="event.stopPropagation()" onchange="editLucLegerTemps('${escapeHtml(classe)}','${s.id}',this.value)"> s`;
+    } else if(r && r.absent){
+      resultCell = '—';
+    } else {
+      resultCell = '—';
+    }
+    const nomCell = clickable
+      ? `<span class="dc-tile">🏃 ${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}</span>`
+      : `${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}`;
+    return `
+      <tr class="${rowClass} ${clickable?'row-clickable':''}" style="${bgLight('--col-4')}" ${clickable?`onclick="recordLucLegerResult('${escapeHtml(classe)}','${s.id}')"`:''}>
+        <td>${nomCell}</td>
+        <td onclick="event.stopPropagation()">${groupCheckboxes(classe,s.id,s.group)}</td>
+        <td onclick="event.stopPropagation()">${resultCell}</td>
+        <td>${r&&r.absent?niveauPill(null):(niveau?niveauPill(niveau):'—')}</td>
+        <td>${r&&r.note!=null?notePill(r.note):'—'}${r&&r.done?resetBtn(classe,s.id,'lucLeger'):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td onclick="event.stopPropagation()">
+          <label><input type="checkbox" class="absent-checkbox" ${r&&r.absent?'checked':''} onchange="toggleAbsentLL('${escapeHtml(classe)}','${s.id}',this.checked)"> Absent</label>
+        </td>
+      </tr>`;
+  }).join('');
+  return `
+    <div class="card">
+      <h3>Groupe ${group} (${students.length})</h3>
+      <div class="table-wrapper compact">
+        <table>
+          <thead><tr style="background:${group==='A'?'var(--col-1)':'var(--col-2)'};"><th>Élève</th><th>Grp</th><th>Résultat</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="8">Aucun élève</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+async function editLucLegerPalier(classe, studentId, palierStr){
+  const palier = parseInt(palierStr);
+  const entry = PALIER_SCHEDULE.find(p=>p.palier===palier);
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s || !s.results.lucLeger || !entry) return;
+  s.results.lucLeger.palier = palier;
+  s.results.lucLeger.vitesse = entry.vitesse;
+  s.results.lucLeger.note = null;
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'endurance', palier, s.sexe);
+  if(s.results.lucLeger && s.results.lucLeger.palier===palier){
+    s.results.lucLeger.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function editLucLegerTemps(classe, studentId, tempsStr){
+  const temps = parseFloat(tempsStr);
+  if(isNaN(temps)) return;
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s || !s.results.lucLeger) return;
+  s.results.lucLeger.temps = temps;
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+function moveGroup(classe, studentId, newGroup){
+  const s = STATE.classes[classe].students.find(s=>s.id===studentId);
+  s.group = newGroup;
+  saveState();
+  renderClassTab(classe);
+}
+function groupCheckboxes(classe, studentId, group){
+  return `
+    <label><input type="checkbox" ${group==='A'?'checked':''} onclick="event.stopPropagation();moveGroup('${escapeHtml(classe)}','${studentId}','A')"> A</label>
+    <label><input type="checkbox" ${group==='B'?'checked':''} onclick="event.stopPropagation();moveGroup('${escapeHtml(classe)}','${studentId}','B')"> B</label>`;
+}
+function toggleAbsentLL(classe, studentId, checked){
+  const s = STATE.classes[classe].students.find(s=>s.id===studentId);
+  if(checked) s.results.lucLeger = {absent:true, done:false};
+  else clearResult(s, 'lucLeger');
+  saveState();
+  checkAutoStop(classe);
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+function departCommun(classe){
+  for(const c of STATE.order){
+    if(c!==classe && STATE.classes[c].runState.running){
+      alert('Un test Luc Léger est déjà en cours pour la classe '+c+'. Arrêtez-le avant d\'en démarrer un nouveau.');
+      return;
+    }
+  }
+  const audio = getAudio();
+  audio.currentTime = 0;
+  audio.play().catch(err=>alert("Impossible de lancer le son : "+err.message));
+  STATE.classes[classe].runState = {running:true};
+  if(liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(()=>updateLiveDisplay(classe), 300);
+  renderClassTab(classe);
+}
+function stopDepart(classe){
+  const audio = getAudio();
+  audio.pause();
+  STATE.classes[classe].runState = {running:false};
+  if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
+  saveState();
+  renderClassTab(classe);
+}
+function updateLiveDisplay(classe){
+  const el = document.getElementById('liveDisplay-'+slug(classe));
+  if(!el) return;
+  const audio = getAudio();
+  const elapsed = audio.currentTime;
+  const idx = getPalierIndexAt(elapsed);
+  const p = PALIER_SCHEDULE[idx];
+  el.textContent = `Palier ${p.palier} | ${p.vitesse.toFixed(1)} km/h | ${formatMMSS(elapsed)}`;
+}
+async function recordLucLegerResult(classe, studentId){
+  const cl = STATE.classes[classe];
+  if(!cl.runState.running) return;
+  const audio = getAudio();
+  const elapsed = audio.currentTime;
+  const student = cl.students.find(s=>s.id===studentId);
+  if(!student || student.group!==cl.activeGroup) return;
+  if(student.results.lucLeger && (student.results.lucLeger.done||student.results.lucLeger.absent)) return;
+  const r = computeResultatLucLeger(elapsed);
+  student.results.lucLeger = {done:true, absent:false, palier:r.palier, vitesse:r.vitesse, temps:elapsed, note:null};
+  saveState();
+  checkAutoStop(classe);
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'endurance', r.palier, student.sexe);
+  if(student.results.lucLeger && student.results.lucLeger.done && student.results.lucLeger.temps===elapsed){
+    student.results.lucLeger.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function checkAutoStop(classe){
+  const cl = STATE.classes[classe];
+  if(!cl.runState.running) return;
+  const groupStudents = cl.students.filter(s=>s.group===cl.activeGroup);
+  const allDone = groupStudents.length>0 && groupStudents.every(s=>s.results.lucLeger && (s.results.lucLeger.done||s.results.lucLeger.absent));
+  if(allDone) stopDepart(classe);
+}
+getAudio_onEndedSetup();
+function getAudio_onEndedSetup(){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const audio = getAudio();
+    audio.addEventListener('ended', ()=>{
+      for(const c of STATE.order){
+        if(STATE.classes[c].runState.running) stopDepart(c);
+      }
+    });
+  });
+}
+
+/* ===================== TESTS "VALEUR SIMPLE" (Longueur / Détente horiz. / Détente vert. / Pompes) ===================== */
+const SIMPLE_TEST_CONFIG = {
+  longueur: {unite:'cm', step:'1', niveauFn:niveauLongueur, baremeKey:'longueur', couleur:'--col-3'},
+  detenteHorizontale: {unite:'m', step:'0.01', niveauFn:null, baremeKey:'detenteHorizontale', couleur:'--col-3'},
+  detenteVerticale: {unite:'cm', step:'1', niveauFn:null, baremeKey:'detenteVerticale', couleur:'--col-6'},
+  pompes: {unite:'reps', step:'1', niveauFn:null, baremeKey:'pompes', couleur:'--col-7'}
+};
+function renderSimpleNumericTest(classe, testKey){
+  const config = SIMPLE_TEST_CONFIG[testKey];
+  const cl = STATE.classes[classe];
+  const container = qs('#testContent-'+slug(classe));
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const ranks = computeTestRanks(classe, testKey);
+  const rowsArr = students.map((s,i)=>{
+    const r = s.results[testKey];
+    const niveau = r && !r.absent && r.valeur!=null ? (config.niveauFn ? config.niveauFn(r.valeur) : niveauFromNote(r.note)) : null;
+    return `
+      <tr class="${r&&r.absent?'row-absent':''}" style="${bgLight(config.couleur)}">
+        <td class="row-clickable" onclick="focusSimpleInput('${slug(classe)}','${testKey}',${i})">${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}</td>
+        <td>
+          <input type="number" step="${config.step}" id="si-input-${testKey}-${slug(classe)}-${i}" value="${r&&r.valeur!=null?r.valeur:''}" placeholder="${config.unite}"
+            ${r&&r.absent?'disabled':''}
+            onkeydown="if(event.key==='Enter'){ event.preventDefault(); validerSimpleValeur('${escapeHtml(classe)}','${testKey}',${i}); }"
+            onchange="validerSimpleValeur('${escapeHtml(classe)}','${testKey}',${i})" style="width:70px;">
+        </td>
+        <td>${niveau?niveauPill(niveau):(r&&r.absent?niveauPill(null):'—')}</td>
+        <td>${r&&r.note!=null?notePill(r.note):'—'}${r&&r.valeur!=null?resetBtn(classe,s.id,testKey):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td><label><input type="checkbox" class="absent-checkbox" ${r&&r.absent?'checked':''} onchange="toggleAbsentSimple('${escapeHtml(classe)}','${testKey}',${i},this.checked)"></label></td>
+      </tr>`;
+  });
+  const thead = `<thead><tr style="background:var(${config.couleur});"><th>Élève</th><th>${config.unite}</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>`;
+  container.innerHTML = `
+    <div class="card">
+      <p class="help-text">Cliquez sur un élève ou saisissez la valeur (${config.unite}) puis appuyez sur Entrée pour valider et passer à l'élève suivant.</p>
+    </div>
+    ${twoColumnBlocks(thead, rowsArr, 7)}
+    <div class="card">${classAverageHtml(classe, testKey)}</div>`;
+}
+function focusSimpleInput(classeSlug, testKey, idx){
+  const el = document.getElementById(`si-input-${testKey}-${classeSlug}-${idx}`);
+  if(el){ el.focus(); el.select(); }
+}
+async function validerSimpleValeur(classe, testKey, idx){
+  const config = SIMPLE_TEST_CONFIG[testKey];
+  const el = document.getElementById(`si-input-${testKey}-${slug(classe)}-${idx}`);
+  const val = parseFloat(el.value);
+  if(isNaN(val)) return;
+  const cl = STATE.classes[classe];
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const student = students[idx];
+  student.results[testKey] = {absent:false, valeur:val, note:null};
+  saveState();
+  renderClassTab(classe);
+  requestAnimationFrame(()=>{
+    const next = document.getElementById(`si-input-${testKey}-${slug(classe)}-${idx+1}`);
+    if(next){ next.focus(); next.select(); }
+  });
+  const note = await computeNote(classe, config.baremeKey, val, student.sexe);
+  if(student.results[testKey] && student.results[testKey].valeur===val){
+    student.results[testKey].note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function toggleAbsentSimple(classe, testKey, idx, checked){
+  const cl = STATE.classes[classe];
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const student = students[idx];
+  if(checked) student.results[testKey] = {absent:true};
+  else clearResult(student, testKey);
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+
+/* ===================== SOUPLESSE ===================== */
+const SOUPLESSE_LEVELS = [
+  {perf:0, label:'Tient moins de 10 sec'},
+  {perf:1, label:'Touche ses genoux durant 10 sec'},
+  {perf:1.5, label:'Touche ses tibias durant 10 sec'},
+  {perf:2, label:'Touche ses chevilles durant 10 sec'},
+  {perf:2.5, label:'Presque bout des doigts'},
+  {perf:3, label:'Le bout des doigts touchent le sol durant 10sec'},
+  {perf:3.5, label:'Presque main à plat'},
+  {perf:4, label:'Main à plat au sol pendant 10sec'},
+  {perf:5, label:'Main à plat au sol, tête contre les genoux, pendant 10sec'}
+];
+function renderSouplesse(classe){
+  const cl = STATE.classes[classe];
+  const container = qs('#testContent-'+slug(classe));
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const ranks = computeTestRanks(classe, 'souplesse');
+  const rowsArr = students.map((s,i)=>{
+    const r = s.results.souplesse;
+    const niveau = r && !r.absent && r.perf!=null ? niveauFromNote(r.note) : null;
+    const options = SOUPLESSE_LEVELS.map(l=>`<option value="${l.perf}" ${r&&r.perf===l.perf?'selected':''}>${escapeHtml(l.label)}</option>`).join('');
+    return `
+      <tr class="${r&&r.absent?'row-absent':''}" style="${bgLight('--col-8')}">
+        <td>${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}</td>
+        <td>
+          <select style="max-width:150px;" ${r&&r.absent?'disabled':''} onchange="validerSouplesse('${escapeHtml(classe)}',${i},this.value)">
+            <option value="">-- Choisir --</option>
+            ${options}
+          </select>
+        </td>
+        <td>${niveau?niveauPill(niveau):(r&&r.absent?niveauPill(null):'—')}</td>
+        <td>${r&&r.note!=null?notePill(r.note):'—'}${r&&r.perf!=null?resetBtn(classe,s.id,'souplesse'):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td><label><input type="checkbox" class="absent-checkbox" ${r&&r.absent?'checked':''} onchange="toggleAbsentSimple('${escapeHtml(classe)}','souplesse',${i},this.checked)"></label></td>
+      </tr>`;
+  });
+  const thead = `<thead><tr style="background:var(--col-8);"><th>Élève</th><th>Niveau atteint</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>`;
+  container.innerHTML = `
+    <div class="card">
+      <p class="help-text">Choisissez le niveau atteint pour chaque élève dans la liste déroulante.</p>
+    </div>
+    ${twoColumnBlocks(thead, rowsArr, 7)}
+    <div class="card">${classAverageHtml(classe, 'souplesse')}</div>`;
+}
+async function validerSouplesse(classe, idx, value){
+  const perf = parseFloat(value);
+  if(isNaN(perf)) return;
+  const cl = STATE.classes[classe];
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const student = students[idx];
+  student.results.souplesse = {absent:false, perf, note:null};
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'souplesse', perf, student.sexe);
+  if(student.results.souplesse && student.results.souplesse.perf===perf){
+    student.results.souplesse.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+
+/* ===================== VITESSE ===================== */
+let vitesseChrono = { classe:null, studentIdx:null, startTs:null, interval:null };
+function renderVitesse(classe){
+  const cl = STATE.classes[classe];
+  const container = qs('#testContent-'+slug(classe));
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const selIdx = (vitesseChrono.classe===classe) ? vitesseChrono.studentIdx : null;
+  const selName = selIdx!=null ? students[selIdx].nomPrenom : '--';
+  const running = vitesseChrono.classe===classe && vitesseChrono.interval!==null;
+  const ranks = computeTestRanks(classe, 'vitesse');
+  const rowsArr = students.map((s,i)=>{
+    const r = s.results.vitesse;
+    const niveau = r && !r.absent && r.temps!=null ? niveauVitesse(r.temps) : null;
+    const isSelected = selIdx===i;
+    return `
+      <tr class="${r&&r.absent?'row-absent':''} ${isSelected?'row-done':''} row-clickable" style="${bgLight('--col-5')}" onclick="selectVitesseStudent('${escapeHtml(classe)}',${i})">
+        <td>${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)} ${isSelected?'👉':''}</td>
+        <td>
+          <input type="number" step="0.01" value="${r&&r.temps!=null?r.temps:''}" placeholder="sec" style="width:70px;"
+            onclick="event.stopPropagation()"
+            ${r&&r.absent?'disabled':''}
+            onchange="setVitesseManuel('${escapeHtml(classe)}',${i},this.value)">
+        </td>
+        <td>${niveau?niveauPill(niveau):(r&&r.absent?niveauPill(null):'—')}</td>
+        <td>${r&&r.note!=null?notePill(r.note):'—'}${r&&r.temps!=null?resetBtn(classe,s.id,'vitesse'):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td onclick="event.stopPropagation()"><label><input type="checkbox" class="absent-checkbox" ${r&&r.absent?'checked':''} onchange="toggleAbsentSimple('${escapeHtml(classe)}','vitesse',${i},this.checked)"></label></td>
+      </tr>`;
+  });
+  const thead = `<thead><tr style="background:var(--col-5);"><th>Élève</th><th>Temps</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>`;
+  container.innerHTML = `
+    <div class="card">
+      <div class="row-flex">
+        <div>Élève sélectionné : <strong>${escapeHtml(selName)}</strong></div>
+        <div class="chrono-display" id="vChronoDisplay-${slug(classe)}">0.00 s</div>
+        ${!running
+          ? `<button class="btn-primary btn-xl" ${selIdx==null?'disabled':''} onclick="startVitesseChrono('${escapeHtml(classe)}')">▶️ Démarrer</button>`
+          : `<button class="btn-danger btn-xl" onclick="stopVitesseChrono('${escapeHtml(classe)}')">⏹️ Arrêter</button>
+             <button class="btn-secondary btn-xl" onclick="restartVitesseChrono('${escapeHtml(classe)}')">🔄 Recommencer (faux départ)</button>`}
+      </div>
+      <p class="help-text">Cliquez sur un élève pour le sélectionner, puis « Démarrer » lance le chrono. « Arrêter » enregistre le temps et sélectionne automatiquement l'élève suivant. En cas de faux départ, « Recommencer » relance le chrono à zéro sans enregistrer.</p>
+    </div>
+    ${twoColumnBlocks(thead, rowsArr, 7)}
+    <div class="card">${classAverageHtml(classe, 'vitesse')}</div>`;
+  if(running) updateVitesseChronoDisplay(classe);
+}
+function selectVitesseStudent(classe, idx){
+  if(vitesseChrono.interval) return;
+  vitesseChrono.classe = classe;
+  vitesseChrono.studentIdx = idx;
+  renderClassTab(classe);
+}
+function startVitesseChrono(classe){
+  if(vitesseChrono.studentIdx==null) return;
+  vitesseChrono.startTs = performance.now();
+  vitesseChrono.interval = setInterval(()=>updateVitesseChronoDisplay(classe), 30);
+  renderClassTab(classe);
+}
+function restartVitesseChrono(classe){
+  if(vitesseChrono.interval){ clearInterval(vitesseChrono.interval); vitesseChrono.interval=null; }
+  vitesseChrono.startTs = null;
+  renderClassTab(classe);
+}
+function updateVitesseChronoDisplay(classe){
+  const el = document.getElementById('vChronoDisplay-'+slug(classe));
+  if(!el || !vitesseChrono.interval) return;
+  const elapsed = (performance.now()-vitesseChrono.startTs)/1000;
+  el.textContent = elapsed.toFixed(2)+' s';
+}
+async function stopVitesseChrono(classe){
+  const elapsed = (performance.now()-vitesseChrono.startTs)/1000;
+  clearInterval(vitesseChrono.interval);
+  vitesseChrono.interval = null;
+  const cl = STATE.classes[classe];
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const student = students[vitesseChrono.studentIdx];
+  const temps = Math.round(elapsed*100)/100;
+  student.results.vitesse = {absent:false, temps, note:null};
+  saveState();
+  // sélection automatique de l'élève suivant sans résultat
+  let nextIdx = null;
+  for(let i=vitesseChrono.studentIdx+1;i<students.length;i++){
+    if(!students[i].results.vitesse) { nextIdx = i; break; }
+  }
+  vitesseChrono.studentIdx = nextIdx;
+  if(nextIdx===null) vitesseChrono.classe = null;
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'vitesse', temps, student.sexe);
+  if(student.results.vitesse && student.results.vitesse.temps===temps){
+    student.results.vitesse.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+async function setVitesseManuel(classe, idx, value){
+  const val = parseFloat(value);
+  if(isNaN(val)) return;
+  const cl = STATE.classes[classe];
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const student = students[idx];
+  student.results.vitesse = {absent:false, temps:val, note:null};
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'vitesse', val, student.sexe);
+  if(student.results.vitesse && student.results.vitesse.temps===val){
+    student.results.vitesse.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+
+/* ===================== DEMI-COOPER (endurance 5-4-3ème) ===================== */
+function renderDemiCooper(classe){
+  const cl = STATE.classes[classe];
+  if(!cl.trackSize){ cl.trackSize = 150; saveState(); }
+  const container = qs('#testContent-'+slug(classe));
+  const running = cl.runState.running;
+  container.innerHTML = `
+    <div class="card">
+      <div class="row-flex">
+        <label>Taille de piste :
+          <select ${running?'disabled':''} onchange="STATE.classes['${escapeHtml(classe)}'].trackSize=parseInt(this.value); saveState(); renderClassTab('${escapeHtml(classe)}')">
+            <option value="100" ${cl.trackSize===100?'selected':''}>100 m</option>
+            <option value="150" ${cl.trackSize===150?'selected':''}>150 m</option>
+          </select>
+        </label>
+        <label>Groupe qui commence :
+          <select ${running?'disabled':''} onchange="STATE.classes['${escapeHtml(classe)}'].activeGroup=this.value; saveState(); renderClassTab('${escapeHtml(classe)}')">
+            <option value="A" ${cl.activeGroup==='A'?'selected':''}>Groupe A</option>
+            <option value="B" ${cl.activeGroup==='B'?'selected':''}>Groupe B</option>
+          </select>
+        </label>
+        ${!running
+          ? `<button class="btn-primary" onclick="departDemiCooper('${escapeHtml(classe)}')">▶️ Départ commun (Groupe ${cl.activeGroup})</button>`
+          : `<button class="btn-danger" onclick="stopDemiCooper('${escapeHtml(classe)}')">⏹️ Arrêter</button>`}
+        ${running ? `<span class="ll-live" id="dc-live-${slug(classe)}">06:00</span>` : ''}
+      </div>
+      <p class="help-text">${!running ? "Cliquez sur « Départ commun » pour lancer le décompte de 6 minutes. À l'arrêt, la note est calculée automatiquement ; ajoutez ensuite une distance supplémentaire si besoin pour affiner la performance." : "Cliquez sur un élève du groupe actif à chaque tour effectué."}</p>
+    </div>
+    <div class="ll-columns">
+      ${renderDemiCooperGroupColumn(classe,'A',computeTestRanks(classe,'demiCooper'))}
+      ${renderDemiCooperGroupColumn(classe,'B',computeTestRanks(classe,'demiCooper'))}
+    </div>
+    <div class="card">${classAverageHtml(classe, 'demiCooper')}</div>
+  `;
+  if(running) updateDemiCooperLive(classe);
+}
+function renderDemiCooperGroupColumn(classe, group, ranks){
+  const cl = STATE.classes[classe];
+  const students = cl.students.filter(s=>s.group===group).sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const isActiveGroup = cl.activeGroup===group;
+  const running = cl.runState.running && isActiveGroup;
+  const rows = students.map(s=>{
+    const r = s.results.demiCooper;
+    const done = r && r.done;
+    const absent = r && r.absent;
+    const tours = r ? (r.tours||0) : 0;
+    const clickableRow = running && !done && !absent;
+    let toursCell, distanceTotale, niv=null;
+    if(done){
+      niv = niveauFromNote(r.note);
+      toursCell = `
+        <input type="number" value="${r.tours}" style="width:45px" onclick="event.stopPropagation()" onchange="editDemiCooperTours('${escapeHtml(classe)}','${s.id}',this.value)"> t. +
+        <input type="number" step="0.1" value="${r.distanceSupp||0}" style="width:55px" onclick="event.stopPropagation()" onchange="editDemiCooperSupp('${escapeHtml(classe)}','${s.id}',this.value)"> m`;
+      distanceTotale = `${r.valeur} m`;
+    } else if(absent){
+      toursCell = '—';
+      distanceTotale = '—';
+    } else {
+      toursCell = `${tours} tour(s)`;
+      distanceTotale = `${tours*cl.trackSize} m`;
+    }
+    const nomCell = clickableRow
+      ? `<span class="dc-tile">🏃 ${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}</span>`
+      : `${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}`;
+    return `
+      <tr class="${absent?'row-absent':(done?'row-done':'')} ${clickableRow?'row-clickable':''}" style="${bgLight('--col-4')}" ${clickableRow?`onclick="incrementTour('${escapeHtml(classe)}','${s.id}')"`:''}>
+        <td>${nomCell}</td>
+        <td onclick="event.stopPropagation()">${groupCheckboxes(classe,s.id,s.group)}</td>
+        <td onclick="event.stopPropagation()">${toursCell}</td>
+        <td>${distanceTotale}</td>
+        <td>${absent?niveauPill(null):(niv?niveauPill(niv):'—')}</td>
+        <td onclick="event.stopPropagation()">${r&&r.note!=null?notePill(r.note):'—'}${done?resetBtn(classe,s.id,'demiCooper'):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td onclick="event.stopPropagation()">${!done ? `<label><input type="checkbox" class="absent-checkbox" ${absent?'checked':''} onchange="toggleAbsentDemiCooper('${escapeHtml(classe)}','${s.id}',this.checked)"> Absent</label>` : ''}</td>
+      </tr>`;
+  }).join('');
+  return `
+    <div class="card">
+      <h3>Groupe ${group} (${students.length})</h3>
+      <div class="table-wrapper compact">
+        <table>
+          <thead><tr style="background:${group==='A'?'var(--col-1)':'var(--col-2)'};"><th>Élève</th><th>Grp</th><th>Tours</th><th>Distance totale</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>
+          <tbody>${rows || '<tr><td colspan="9">Aucun élève</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+async function editDemiCooperTours(classe, studentId, val){
+  const tours = parseInt(val);
+  if(isNaN(tours)) return;
+  await recalcDemiCooper(classe, studentId, {tours});
+}
+async function editDemiCooperSupp(classe, studentId, val){
+  const supp = parseFloat(val);
+  if(isNaN(supp)) return;
+  await recalcDemiCooper(classe, studentId, {distanceSupp:supp});
+}
+async function recalcDemiCooper(classe, studentId, patch){
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s || !s.results.demiCooper) return;
+  Object.assign(s.results.demiCooper, patch);
+  const tours = s.results.demiCooper.tours||0;
+  const supp = s.results.demiCooper.distanceSupp||0;
+  const valeur = tours*cl.trackSize + supp;
+  s.results.demiCooper.valeur = valeur;
+  s.results.demiCooper.note = null;
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'endurance', valeur, s.sexe);
+  if(s.results.demiCooper && s.results.demiCooper.valeur===valeur){
+    s.results.demiCooper.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function departDemiCooper(classe){
+  for(const c of STATE.order){
+    if(c!==classe && STATE.classes[c].runState.running){
+      alert('Un test est déjà en cours pour la classe '+c+'. Arrêtez-le avant d\'en démarrer un nouveau.');
+      return;
+    }
+  }
+  const cl = STATE.classes[classe];
+  cl.runState = {running:true, locked:false, startTs: Date.now()};
+  if(liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(()=>updateDemiCooperLive(classe), 500);
+  saveState();
+  renderClassTab(classe);
+}
+function updateDemiCooperLive(classe){
+  const cl = STATE.classes[classe];
+  if(!cl.runState.running) return;
+  const elapsed = (Date.now()-cl.runState.startTs)/1000;
+  const remaining = Math.max(0, 360-elapsed);
+  const el = document.getElementById('dc-live-'+slug(classe));
+  if(el) el.textContent = formatMMSS(remaining);
+  if(remaining<=0) lockDemiCooper(classe);
+}
+function stopDemiCooper(classe){ lockDemiCooper(classe); }
+async function lockDemiCooper(classe){
+  const cl = STATE.classes[classe];
+  const activeGroup = cl.activeGroup;
+  cl.runState = {running:false, locked:true};
+  if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
+  const groupStudents = cl.students.filter(s=>s.group===activeGroup);
+  const toFinalize = [];
+  groupStudents.forEach(s=>{
+    if(s.results.demiCooper && (s.results.demiCooper.done || s.results.demiCooper.absent)) return;
+    const tours = s.results.demiCooper ? (s.results.demiCooper.tours||0) : 0;
+    const valeur = tours*cl.trackSize;
+    s.results.demiCooper = {absent:false, done:true, tours, distanceSupp:0, valeur, note:null};
+    toFinalize.push(s);
+  });
+  saveState();
+  renderClassTab(classe);
+  for(const s of toFinalize){
+    const valeurAtCall = s.results.demiCooper.valeur;
+    const note = await computeNote(classe, 'endurance', valeurAtCall, s.sexe);
+    if(s.results.demiCooper && s.results.demiCooper.valeur===valeurAtCall){
+      s.results.demiCooper.note = note;
+    }
+  }
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+function incrementTour(classe, studentId){
+  const cl = STATE.classes[classe];
+  if(!cl.runState.running) return;
+  const s = cl.students.find(s=>s.id===studentId);
+  if(!s || s.group!==cl.activeGroup) return;
+  if(!s.results.demiCooper) s.results.demiCooper = {tours:0, absent:false, done:false};
+  if(s.results.demiCooper.done || s.results.demiCooper.absent) return;
+  s.results.demiCooper.tours = (s.results.demiCooper.tours||0)+1;
+  saveState();
+  renderClassTab(classe);
+}
+function toggleAbsentDemiCooper(classe, studentId, checked){
+  const s = STATE.classes[classe].students.find(s=>s.id===studentId);
+  if(checked) s.results.demiCooper = {absent:true, done:false, tours:0};
+  else clearResult(s, 'demiCooper');
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+
+/* ===================== VITESSE 40m (1 chrono, 3 arrivées tamponnées puis attribuées, 5-4-3ème) ===================== */
+let vitesse40Heat = { classe:null, running:false, startTs:null, stamps:[], assignedCount:0 };
+function renderVitesse40(classe){
+  if(vitesse40Heat.classe!==classe){
+    vitesse40Heat = { classe, running:false, startTs:null, stamps:[], assignedCount:0 };
+  }
+  const cl = STATE.classes[classe];
+  const container = qs('#testContent-'+slug(classe));
+  const students = [...cl.students].sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const running = vitesse40Heat.running;
+  const pending = vitesse40Heat.stamps.length - vitesse40Heat.assignedCount;
+  const stampsHtml = vitesse40Heat.stamps.map((t,i)=>{
+    const assigned = i<vitesse40Heat.assignedCount;
+    return `<span class="badge" style="background:${assigned?'#94a3b8':'var(--col-6)'};">Arrivée ${i+1} : ${t.toFixed(2)}s${assigned?' ✓':''}</span>`;
+  }).join(' ');
+  container.innerHTML = `
+    <div class="card">
+      <div class="row-flex">
+        ${!running
+          ? `<button class="btn-primary" onclick="departVitesse40('${escapeHtml(classe)}')">▶️ Départ commun</button>`
+          : `<button class="btn-success" ${vitesse40Heat.stamps.length>=3?'disabled':''} onclick="stampVitesse40('${escapeHtml(classe)}')">🏁 Arrivée (${vitesse40Heat.stamps.length}/3)</button>
+             <button class="btn-danger" onclick="stopVitesse40Heat('${escapeHtml(classe)}')">⏹️ Arrêter</button>
+             <div class="chrono-display" id="v40-live-${slug(classe)}">0.00 s</div>`}
+        ${(running || pending>0) ? `<button class="btn-secondary" onclick="restartVitesse40Heat('${escapeHtml(classe)}')">🔄 Recommencer (faux départ)</button>` : ''}
+      </div>
+      ${stampsHtml?`<div class="row-flex" style="margin-top:6px;">${stampsHtml}</div>`:''}
+      <p class="help-text">${pending>0 ? `Cliquez sur ${pending} élève(s) dans la liste ci-dessous, dans l'ordre exact d'arrivée, pour leur attribuer un temps.` : "Cliquez « Départ commun », puis « Arrivée » à chaque franchissement de ligne (jusqu'à 3 coureurs). En cas de faux départ, « Recommencer » annule la course en cours."}</p>
+    </div>
+    <div id="v40-roster-${slug(classe)}"></div>
+  `;
+  renderVitesse40Roster(classe, students);
+  if(running) updateVitesse40Live(classe);
+}
+function departVitesse40(classe){
+  for(const c of STATE.order){
+    if(c!==classe && STATE.classes[c].runState && STATE.classes[c].runState.running){
+      alert('Un test est déjà en cours pour la classe '+c+'. Arrêtez-le avant d\'en démarrer un nouveau.');
+      return;
+    }
+  }
+  vitesse40Heat.running = true;
+  vitesse40Heat.startTs = performance.now();
+  vitesse40Heat.stamps = [];
+  vitesse40Heat.assignedCount = 0;
+  if(liveTimer) clearInterval(liveTimer);
+  liveTimer = setInterval(()=>updateVitesse40Live(classe), 30);
+  renderClassTab(classe);
+}
+function updateVitesse40Live(classe){
+  if(!vitesse40Heat.running) return;
+  const el = document.getElementById('v40-live-'+slug(classe));
+  if(el) el.textContent = ((performance.now()-vitesse40Heat.startTs)/1000).toFixed(2)+' s';
+}
+function stampVitesse40(classe){
+  if(!vitesse40Heat.running || vitesse40Heat.stamps.length>=3) return;
+  const elapsed = (performance.now()-vitesse40Heat.startTs)/1000;
+  vitesse40Heat.stamps.push(Math.round(elapsed*100)/100);
+  if(vitesse40Heat.stamps.length>=3) stopVitesse40Heat(classe);
+  else renderClassTab(classe);
+}
+function stopVitesse40Heat(classe){
+  vitesse40Heat.running = false;
+  if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
+  renderClassTab(classe);
+}
+function restartVitesse40Heat(classe){
+  if(vitesse40Heat.classe!==classe) return;
+  if(liveTimer){ clearInterval(liveTimer); liveTimer=null; }
+  vitesse40Heat.running = false;
+  vitesse40Heat.startTs = null;
+  vitesse40Heat.stamps = [];
+  vitesse40Heat.assignedCount = 0;
+  renderClassTab(classe);
+}
+async function assignVitesse40(classe, studentId){
+  if(vitesse40Heat.classe!==classe || vitesse40Heat.assignedCount>=vitesse40Heat.stamps.length) return;
+  const temps = vitesse40Heat.stamps[vitesse40Heat.assignedCount];
+  vitesse40Heat.assignedCount++;
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s) return;
+  s.results.vitesse40 = {absent:false, temps, note:null};
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'vitesse', temps, s.sexe);
+  if(s.results.vitesse40 && s.results.vitesse40.temps===temps){
+    s.results.vitesse40.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function renderVitesse40Roster(classe, students){
+  const container = document.getElementById('v40-roster-'+slug(classe));
+  if(!container) return;
+  const ranks = computeTestRanks(classe, 'vitesse40');
+  const pending = (vitesse40Heat.classe===classe) ? (vitesse40Heat.stamps.length - vitesse40Heat.assignedCount) : 0;
+  const rowsArr = students.map((s)=>{
+    const r = s.results.vitesse40;
+    const niveau = r && !r.absent && r.temps!=null ? niveauFromNote(r.note) : null;
+    const clickable = pending>0 && !r;
+    const nomCell = clickable
+      ? `<span class="dc-tile">🏁 ${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}</span>`
+      : `${escapeHtml(s.nomPrenom)} ${sexeIcon(s.sexe)}`;
+    let valeurCell;
+    if(r && r.temps!=null){
+      valeurCell = `<input type="number" step="0.01" value="${r.temps}" style="width:70px;" ${r.absent?'disabled':''} onclick="event.stopPropagation()" onchange="setVitesse40Manuel('${escapeHtml(classe)}','${s.id}',this.value)">`;
+    } else {
+      valeurCell = '—';
+    }
+    return `
+      <tr class="${r&&r.absent?'row-absent':''} ${clickable?'row-clickable':''}" style="${bgLight('--col-5')}" ${clickable?`onclick="assignVitesse40('${escapeHtml(classe)}','${s.id}')"`:''}>
+        <td>${nomCell}</td>
+        <td onclick="event.stopPropagation()">${valeurCell}</td>
+        <td>${niveau?niveauPill(niveau):(r&&r.absent?niveauPill(null):'—')}</td>
+        <td>${r&&r.note!=null?notePill(r.note):'—'}${r&&r.temps!=null?resetBtn(classe,s.id,'vitesse40'):''}</td>
+        <td>${rankGenCell(ranks,s.id)}</td>
+        <td>${rankSexeCell(ranks,s.id,s.sexe)}</td>
+        <td onclick="event.stopPropagation()"><label><input type="checkbox" class="absent-checkbox" ${r&&r.absent?'checked':''} onchange="toggleAbsentVitesse40('${escapeHtml(classe)}','${s.id}',this.checked)"></label></td>
+      </tr>`;
+  });
+  const thead = `<thead><tr style="background:var(--col-5);"><th>Élève</th><th>Temps</th><th>Niveau</th><th>Note</th><th>Rg.Gén</th><th>Rg.Sexe</th><th>Abs.</th></tr></thead>`;
+  container.innerHTML = twoColumnBlocks(thead, rowsArr, 7) + `<div class="card">${classAverageHtml(classe, 'vitesse40')}</div>`;
+}
+async function setVitesse40Manuel(classe, studentId, value){
+  const val = parseFloat(value);
+  if(isNaN(val)) return;
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s) return;
+  s.results.vitesse40 = {absent:false, temps:val, note:null};
+  saveState();
+  renderClassTab(classe);
+  const note = await computeNote(classe, 'vitesse', val, s.sexe);
+  if(s.results.vitesse40 && s.results.vitesse40.temps===val){
+    s.results.vitesse40.note = note;
+    saveState();
+    renderClassTab(classe);
+    syncToSheet(classe);
+  }
+}
+function toggleAbsentVitesse40(classe, studentId, checked){
+  const cl = STATE.classes[classe];
+  const s = cl.students.find(x=>x.id===studentId);
+  if(!s) return;
+  if(checked) s.results.vitesse40 = {absent:true};
+  else clearResult(s, 'vitesse40');
+  saveState();
+  renderClassTab(classe);
+  syncToSheet(classe);
+}
+
+/* ===================== DEFINITIONS DES EPREUVES (partagé Résultats/Statistiques) ===================== */
+const TEST_DEFS = {
+  lucLeger: {
+    label:'Endurance (Luc Léger)', resultsKey:'lucLeger', higherIsBetter:true, unite:'km/h', colorVar:'--col-4',
+    isDone:r=>!!(r&&r.done), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${formatMMSS(r.temps)}`,
+    value:r=>r.vitesse*100000+r.temps,
+    avgValue:r=>r.vitesse,
+    niveau:r=>niveauLucLeger(r.vitesse)
+  },
+  longueur: {
+    label:'Longueur', resultsKey:'longueur', higherIsBetter:true, unite:'cm', colorVar:'--col-3',
+    isDone:r=>!!(r&&r.valeur!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.valeur} cm`, value:r=>r.valeur, avgValue:r=>r.valeur,
+    niveau:r=>niveauLongueur(r.valeur)
+  },
+  vitesse: {
+    label:'Vitesse 30m', resultsKey:'vitesse', higherIsBetter:false, unite:'s', colorVar:'--col-5',
+    isDone:r=>!!(r&&r.temps!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.temps} s`, value:r=>r.temps, avgValue:r=>r.temps,
+    niveau:r=>niveauVitesse(r.temps)
+  },
+  detenteVerticale: {
+    label:'Détente verticale', resultsKey:'detenteVerticale', higherIsBetter:true, unite:'cm', colorVar:'--col-6',
+    isDone:r=>!!(r&&r.valeur!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.valeur} cm`, value:r=>r.valeur, avgValue:r=>r.valeur,
+    niveau:r=>niveauFromNote(r.note)
+  },
+  pompes: {
+    label:'Pompes', resultsKey:'pompes', higherIsBetter:true, unite:'reps', colorVar:'--col-7',
+    isDone:r=>!!(r&&r.valeur!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.valeur} reps`, value:r=>r.valeur, avgValue:r=>r.valeur,
+    niveau:r=>niveauFromNote(r.note)
+  },
+  souplesse: {
+    label:'Souplesse', resultsKey:'souplesse', higherIsBetter:true, unite:'/5', colorVar:'--col-8',
+    isDone:r=>!!(r&&r.perf!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>{ const l=SOUPLESSE_LEVELS.find(x=>x.perf===r.perf); return l?l.label:String(r.perf); },
+    value:r=>r.perf, avgValue:r=>r.perf,
+    niveau:r=>niveauFromNote(r.note)
+  },
+  demiCooper: {
+    label:'Endurance (Demi-Cooper)', resultsKey:'demiCooper', higherIsBetter:true, unite:'m', colorVar:'--col-4',
+    isDone:r=>!!(r&&r.done), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.valeur} m (${r.tours} tour(s) + ${r.distanceSupp||0}m)`,
+    value:r=>r.valeur, avgValue:r=>r.valeur,
+    niveau:r=>niveauFromNote(r.note)
+  },
+  vitesse40: {
+    label:'Vitesse 40m', resultsKey:'vitesse40', higherIsBetter:false, unite:'s', colorVar:'--col-5',
+    isDone:r=>!!(r&&r.temps!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.temps} s`, value:r=>r.temps, avgValue:r=>r.temps,
+    niveau:r=>niveauFromNote(r.note)
+  },
+  detenteHorizontale: {
+    label:'Détente horizontale', resultsKey:'detenteHorizontale', higherIsBetter:true, unite:'m', colorVar:'--col-3',
+    isDone:r=>!!(r&&r.valeur!=null), isAbsent:r=>!!(r&&r.absent),
+    display:r=>`${r.valeur} m`, value:r=>r.valeur, avgValue:r=>r.valeur,
+    niveau:r=>niveauFromNote(r.note)
+  }
+};
+function computeClassAverage(classe, testKey){
+  const def = TEST_DEFS[testKey];
+  const cl = STATE.classes[classe];
+  const list = cl.students.filter(s=>def.isDone(s.results[def.resultsKey]));
+  const vals = list.map(s=>def.avgValue(s.results[def.resultsKey]));
+  const notes = list.map(s=>s.results[def.resultsKey].note).filter(n=>n!=null && !isNaN(n));
+  const round2 = v=>Math.round(v*100)/100;
+  return {
+    count: list.length,
+    avgValue: vals.length ? round2(vals.reduce((a,b)=>a+b,0)/vals.length) : null,
+    avgNote: notes.length ? round2(notes.reduce((a,b)=>a+b,0)/notes.length) : null
+  };
+}
+function classAverageHtml(classe, testKey){
+  const def = TEST_DEFS[testKey];
+  const { count, avgValue, avgNote } = computeClassAverage(classe, testKey);
+  if(count===0) return `<p class="help-text">Moyenne de la classe : pas encore de résultat.</p>`;
+  return `<p class="help-text"><strong>Moyenne de la classe</strong> (${count} résultat(s)) — Performance : <strong>${avgValue!=null?avgValue:'—'} ${def.unite}</strong> · Note : <strong>${avgNote!=null?avgNote:'—'}/20</strong></p>`;
+}
+const NIVEAU_TESTS = {
+  '6eme': ['lucLeger','longueur','vitesse','detenteVerticale','souplesse','pompes'],
+  '5eme': ['demiCooper','vitesse40','detenteHorizontale','detenteVerticale','souplesse','pompes'],
+  '4eme3eme': ['demiCooper','vitesse40','detenteHorizontale','detenteVerticale','souplesse','pompes']
+};
+
+/* ===================== RESULTATS ===================== */
+function buildResultColumns(niveau){
+  const base = [
+    {key:'nomPrenom', label:'Nom Prénom', colorVar:'--col-1'},
+    {key:'classe', label:'Classe', colorVar:'--col-2'},
+    {key:'sexe', label:'Sexe', colorVar:'--col-3'}
+  ];
+  const testCols = [];
+  NIVEAU_TESTS[niveau].forEach(testKey=>{
+    const def = TEST_DEFS[testKey];
+    const colorVar = def.colorVar;
+    testCols.push(
+      {key:testKey+'_resultat', label:def.label+' - Résultat', colorVar},
+      {key:testKey+'_niveau', label:def.label+' - Niveau', colorVar},
+      {key:testKey+'_note', label:def.label+' - Note', colorVar}
+    );
+  });
+  return base.concat(testCols);
+}
+let resultatsSort = {key:'nomPrenom', dir:'asc'};
+
+function computeRankMap(students, extractValue, higherIsBetter, filterFn){
+  const withVal = students.filter(filterFn).map(s=>({id:s.id, value:extractValue(s)}));
+  withVal.sort((a,b)=> higherIsBetter ? b.value-a.value : a.value-b.value);
+  const map = {};
+  withVal.forEach((s,i)=>map[s.id]=i+1);
+  return map;
+}
+function computeTestRanks(classe, testKey){
+  const cl = STATE.classes[classe];
+  const def = TEST_DEFS[testKey];
+  const students = cl.students;
+  const filter = s=>def.isDone(s.results[def.resultsKey]);
+  const val = s=>def.value(s.results[def.resultsKey]);
+  return {
+    gen: computeRankMap(students, val, def.higherIsBetter, filter),
+    F: computeRankMap(students, val, def.higherIsBetter, s=>filter(s)&&s.sexe==='F'),
+    M: computeRankMap(students, val, def.higherIsBetter, s=>filter(s)&&s.sexe==='M')
+  };
+}
+function buildResultRows(classe){
+  const cl = STATE.classes[classe];
+  const students = cl.students;
+  const niveau = getNiveau(classe);
+  const testKeys = NIVEAU_TESTS[niveau];
+  return students.map(s=>{
+    const row = { id:s.id, nomPrenom:s.nomPrenom, classe:s.classe, sexe:s.sexe };
+    testKeys.forEach(testKey=>{
+      const def = TEST_DEFS[testKey];
+      const r = s.results[def.resultsKey];
+      const done = def.isDone(r);
+      const absent = def.isAbsent(r);
+      row[testKey+'_resultat'] = done ? def.display(r) : (absent ? 'Absent' : '—');
+      row[testKey+'_niveau'] = done ? def.niveau(r) : (absent ? null : '—');
+      row[testKey+'_note'] = done && r.note!=null ? r.note : '—';
+    });
+    return row;
+  });
+}
+function compareForSort(a,b,key,dir){
+  let va=a[key], vb=b[key];
+  const aEmpty = va===undefined||va===null||va==='—';
+  const bEmpty = vb===undefined||vb===null||vb==='—';
+  if(aEmpty && bEmpty) return 0;
+  if(aEmpty) return 1;
+  if(bEmpty) return -1;
+  if(typeof va==='number' && typeof vb==='number') return dir==='asc'? va-vb : vb-va;
+  return dir==='asc'? String(va).localeCompare(String(vb),'fr') : String(vb).localeCompare(String(va),'fr');
+}
+function medalFor(rank){
+  if(rank===1) return '<span class="medal">🥇</span>';
+  if(rank===2) return '<span class="medal">🥈</span>';
+  if(rank===3) return '<span class="medal">🥉</span>';
+  return '';
+}
+function renderResultats(){
+  const sel = qs('#resultatsClasseSelect');
+  if(!sel.value && STATE.order.length) sel.value = STATE.order[0];
+  const classe = sel.value;
+  const table = qs('#resultatsTable');
+  if(!classe){ table.innerHTML = '<tr><td>Importez d\'abord une classe.</td></tr>'; return; }
+  const niveau = getNiveau(classe);
+  const columns = buildResultColumns(niveau);
+  let rows = buildResultRows(classe);
+  rows.sort((a,b)=>compareForSort(a,b,resultatsSort.key,resultatsSort.dir));
+
+  const sortArrow = key => resultatsSort.key===key ? (resultatsSort.dir==='asc'?'▲':'▼') : '';
+  let row1 = `<th class="sticky-col" style="background:var(--col-1);" rowspan="2" onclick="onSortResultats('nomPrenom')">Nom ${sortArrow('nomPrenom')}</th>`;
+  row1 += `<th style="background:var(--col-2);" rowspan="2" onclick="onSortResultats('classe')">Classe ${sortArrow('classe')}</th>`;
+  row1 += `<th style="background:var(--col-3);" rowspan="2" onclick="onSortResultats('sexe')">Sexe ${sortArrow('sexe')}</th>`;
+  let row2 = '';
+  NIVEAU_TESTS[niveau].forEach(testKey=>{
+    const def = TEST_DEFS[testKey];
+    const colorVar = def.colorVar;
+    row1 += `<th colspan="3" style="background:var(${colorVar});">${def.label}</th>`;
+    row2 += `<th style="background:var(${colorVar});" onclick="onSortResultats('${testKey}_resultat')">Résultat ${sortArrow(testKey+'_resultat')}</th>`;
+    row2 += `<th style="background:var(${colorVar});" onclick="onSortResultats('${testKey}_niveau')">Niveau ${sortArrow(testKey+'_niveau')}</th>`;
+    row2 += `<th style="background:var(${colorVar});" onclick="onSortResultats('${testKey}_note')">Note ${sortArrow(testKey+'_note')}</th>`;
+  });
+  const thead = `<thead><tr>${row1}</tr><tr>${row2}</tr></thead>`;
+
+  const tbody = '<tbody>'+rows.map(r=>{
+    return '<tr>'+columns.map((c,i)=>{
+      let val = r[c.key];
+      let display;
+      if(c.key.endsWith('niveau')) display = val==='—' ? '—' : niveauPill(val);
+      else if(c.key.endsWith('note')) display = (typeof val==='number') ? notePill(val) : val;
+      else display = escapeHtml(String(val));
+      const sticky = i===0 ? ' sticky-col' : '';
+      return `<td class="${sticky}" style="${bgLight(c.colorVar)}">${display}</td>`;
+    }).join('')+'</tr>';
+  }).join('')+'</tbody>';
+
+  table.innerHTML = thead+tbody;
+}
+function onSortResultats(key){
+  if(resultatsSort.key===key) resultatsSort.dir = resultatsSort.dir==='asc'?'desc':'asc';
+  else { resultatsSort.key=key; resultatsSort.dir='asc'; }
+  renderResultats();
+}
+
+/* ===================== STATISTIQUES ===================== */
+function computeStatsForTest(students, def){
+  function statsFor(sexe){
+    const list = students.filter(s=>s.sexe===sexe && def.isDone(s.results[def.resultsKey]));
+    const values = list.map(s=>def.value(s.results[def.resultsKey]));
+    const moyenne = values.length ? values.reduce((a,b)=>a+b,0)/values.length : null;
+    const niveaux = {A:0,F:0,S:0,T:0};
+    list.forEach(s=>{
+      const n = def.niveau(s.results[def.resultsKey]);
+      if(n==='A besoins') niveaux.A++;
+      else if(n==='Fragile') niveaux.F++;
+      else if(n==='Satisfaisant') niveaux.S++;
+      else if(n==='Très bon niveau') niveaux.T++;
+    });
+    return {nb:list.length, moyenne, niveaux};
+  }
+  return {garcons:statsFor('M'), filles:statsFor('F')};
+}
+function renderStatistiques(){
+  const sel = qs('#statsClasseSelect');
+  if(!sel.value && STATE.order.length) sel.value = STATE.order[0];
+  const classe = sel.value;
+  const content = qs('#statsContent');
+  if(!classe){ content.innerHTML='<p>Importez d\'abord une classe.</p>'; return; }
+  const students = STATE.classes[classe].students;
+  const testKeys = NIVEAU_TESTS[getNiveau(classe)];
+
+  function statRow(testKey){
+    const def = TEST_DEFS[testKey];
+    const stats = computeStatsForTest(students, def);
+    const fmt = v=>v==null?'—':(Math.round(v*100)/100);
+    return `
+      <tr>
+        <td>${def.label}</td>
+        <td class="garcon-cell">${stats.garcons.nb}</td>
+        <td class="garcon-cell">${fmt(stats.garcons.moyenne)}</td>
+        <td class="garcon-cell">${stats.garcons.niveaux.A} / ${stats.garcons.niveaux.F} / ${stats.garcons.niveaux.S} / ${stats.garcons.niveaux.T}</td>
+        <td class="fille-cell">${stats.filles.nb}</td>
+        <td class="fille-cell">${fmt(stats.filles.moyenne)}</td>
+        <td class="fille-cell">${stats.filles.niveaux.A} / ${stats.filles.niveaux.F} / ${stats.filles.niveaux.S} / ${stats.filles.niveaux.T}</td>
+      </tr>`;
+  }
+
+  content.innerHTML = `
+    <div class="table-wrapper">
+      <table class="stat-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Test</th>
+            <th class="garcon-head" colspan="3">Garçons</th>
+            <th class="fille-head" colspan="3">Filles</th>
+          </tr>
+          <tr>
+            <th class="garcon-head">Testés</th><th class="garcon-head">Moyenne</th><th class="garcon-head">A besoins / Fragile / Satisfaisant / Très bon niveau</th>
+            <th class="fille-head">Testées</th><th class="fille-head">Moyenne</th><th class="fille-head">A besoins / Fragile / Satisfaisant / Très bon niveau</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${testKeys.map(statRow).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+/* ===================== EXPORT EXCEL ===================== */
+function escapeXml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function buildExcelXML(sheets){
+  let xml = '<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n';
+  sheets.forEach(sheet=>{
+    xml += `<Worksheet ss:Name="${escapeXml(sheet.name.slice(0,31))}"><Table>\n`;
+    sheet.rows.forEach(row=>{
+      xml += '<Row>';
+      row.forEach(cell=>{
+        const isNum = typeof cell === 'number';
+        xml += `<Cell><Data ss:Type="${isNum?'Number':'String'}">${escapeXml(cell===null||cell===undefined?'':cell)}</Data></Cell>`;
+      });
+      xml += '</Row>\n';
+    });
+    xml += '</Table></Worksheet>\n';
+  });
+  xml += '</Workbook>';
+  return xml;
+}
+function buildExportRowsForClasse(classe){
+  const columns = buildResultColumns(getNiveau(classe));
+  const rows = buildResultRows(classe);
+  rows.sort((a,b)=>a.nomPrenom.localeCompare(b.nomPrenom,'fr'));
+  const header = columns.map(c=>c.label);
+  const dataRows = rows.map(r=>columns.map(c=>r[c.key]));
+  return [header, ...dataRows];
+}
+function exportExcel(){
+  if(STATE.order.length===0){ alert('Aucune classe importée.'); return; }
+  const sheets = STATE.order.map(classe=>({name:classe, rows:buildExportRowsForClasse(classe)}));
+  const xml = buildExcelXML(sheets);
+  const blob = new Blob([xml], {type:'application/vnd.ms-excel'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'resultats_tests_physiques.xls';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadState();
+  renderMainTabs();
+  STATE.order.forEach(renderClassTab);
+  if(STATE.order.length){
+    switchTab('classe-'+slug(STATE.order[0]));
+  } else {
+    switchTab('resultats');
+  }
+  if(APPS_SCRIPT_URL) qs('#globalSyncBar').classList.remove('hidden');
+  autoLoadAllFromSheet();
+});
+</script>
+</body>
+</html>
