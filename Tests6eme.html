@@ -792,7 +792,7 @@ function renderLegerPanel(className, cls, students){
       nameCell = `<td>${escapeHtml(fullName(s))}</td>`;
     }else if(r && r.done){
       const niv = niveauLeger(r.palier);
-      perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)}`;
+      perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)} ${clearResultBtn(className,'leger',s.id)}`;
       niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
       const rc = rankCells(legerRanks, s);
       rangSexe = rc.sexe; rangGeneral = rc.general;
@@ -943,11 +943,11 @@ function renderLongueurPanel(className, cls, students){
       perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
     }else if(r.absent){
-      perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+      perf = `<span class="badge badge-abs">Absent</span> ${clearResultBtn(className,'longueur',s.id)}`; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
     }else{
       const niv = niveauLongueur(r.distance);
-      perf = `${r.distance} cm`;
+      perf = `${r.distance} cm ${clearResultBtn(className,'longueur',s.id)}`;
       niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
       const rc = rankCells(longueurRanks, s);
       rangSexe = rc.sexe; rangGeneral = rc.general;
@@ -1030,11 +1030,11 @@ function renderVitessePanel(className, cls, students){
       perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
     }else if(r.absent){
-      perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+      perf = `<span class="badge badge-abs">Absent</span> ${clearResultBtn(className,'vitesse',s.id)}`; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
     }else{
       const niv = niveauVitesse(r.temps);
-      perf = `${r.temps.toFixed(2)} s`;
+      perf = `${r.temps.toFixed(2)} s ${clearResultBtn(className,'vitesse',s.id)}`;
       niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
       const rc = rankCells(vitesseRanks, s);
       rangSexe = rc.sexe; rangGeneral = rc.general;
@@ -1341,6 +1341,14 @@ function attachDynamicHandlers(){
     });
   });
 
+  // Effacer un résultat déjà enregistré (longueur / vitesse / léger)
+  document.querySelectorAll('.clear-result-btn').forEach(el=>{
+    el.addEventListener('click', (ev)=>{
+      ev.stopPropagation();
+      clearResult(el.dataset.class, el.dataset.test, el.dataset.student);
+    });
+  });
+
   // Filtre par classe (onglet Résultats)
   const resultsFilterSel = document.getElementById('resultsClassFilterSelect');
   if(resultsFilterSel){
@@ -1365,6 +1373,19 @@ function recordResult(className, test, studentId, rawValue){
   cls[test].selectedId = null;
   saveState();
   renderAll();
+}
+
+function clearResult(className, test, studentId){
+  if(!confirm("Effacer ce résultat ? L'élève repassera en attente.")) return;
+  const cls = state.classes[className];
+  const s = cls.students.find(x=>x.id===studentId);
+  delete s.results[test];
+  if(cls[test]) cls[test].selectedId = null;
+  saveState();
+  renderAll();
+}
+function clearResultBtn(className, test, studentId){
+  return `<button class="small-btn btn-soft clear-result-btn" data-class="${escapeAttr(className)}" data-test="${test}" data-student="${studentId}" title="Effacer ce résultat">✕</button>`;
 }
 
 /* ==================== INIT ==================== */
