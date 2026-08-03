@@ -368,13 +368,19 @@ function scheduleCloudSync(){
 
 function loadFromCloud(){
   return cloudDoc.get().then(docSnap=>{
-    if(docSnap.exists){
-      const data = docSnap.data();
-      if(data && data.classes){
-        state = data;
-        try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
-        renderAll();
-      }
+    if(!docSnap.exists) return;
+    const data = docSnap.data();
+    if(!data || !data.classes) return;
+    const cloudTime = data.lastModified || 0;
+    const localTime = state.lastModified || 0;
+    if(cloudTime > localTime){
+      // Le cloud a une version plus récente (modifiée depuis un autre appareil) : on l'adopte.
+      state = data;
+      try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){}
+      renderAll();
+    }else if(localTime > cloudTime){
+      // Cet appareil a des données plus récentes que le cloud (ex. saisies faites hors connexion) : on les renvoie.
+      cloudDoc.set(state).catch(e=> console.warn('Synchronisation cloud impossible (hors ligne ?)', e));
     }
   }).catch(e=> console.warn('Chargement cloud impossible (hors ligne ?)', e));
 }
@@ -392,6 +398,7 @@ let legerTimerHandle = null;
 
 /* ==================== PERSISTENCE ==================== */
 function saveState(){
+  state.lastModified = Date.now();
   try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.warn('Sauvegarde locale impossible', e); }
   scheduleCloudSync();
 }
@@ -639,7 +646,7 @@ function exportResults(){
 document.getElementById('btnReset').addEventListener('click', ()=>{
   if(confirm('Cette action supprimera toutes les classes et tous les résultats enregistrés, sur tous les appareils synchronisés. Continuer ?')){
     localStorage.removeItem(STORAGE_KEY);
-    state = {classes:{}, classOrder:[], activeTab:null};
+    state = {classes:{}, classOrder:[], activeTab:null, lastModified: Date.now()};
     if(cloudSyncTimer){ clearTimeout(cloudSyncTimer); cloudSyncTimer = null; }
     cloudDoc.set(state).catch(e=> console.warn('Réinitialisation cloud impossible (hors ligne ?)', e));
     renderAll();
