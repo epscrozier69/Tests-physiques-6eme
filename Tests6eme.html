@@ -918,7 +918,7 @@ function renderLongueurPanel(className, cls, students){
       <div class="name">${escapeHtml(fullName(current))}</div>
       <div class="progress">${doneCount}/${students.length} élève(s) testé(s)</div>
       <div class="inline-form">
-        <label>Distance (cm) : <input type="number" inputmode="numeric" pattern="[0-9]*" id="longueurInput" min="0" step="1" style="width:100px;" value="${existingValue}"></label>
+        <label>Distance (cm) : <input type="text" inputmode="numeric" pattern="[0-9]*" id="longueurInput" style="width:100px;" value="${existingValue}"></label>
         <button class="btn btn-accent" id="btnValidLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">${isEdit ? '💾 Enregistrer' : '✅ Valider'}</button>
         <button class="btn btn-soft" id="btnAbsentLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">🚫 Absent</button>
       </div>
