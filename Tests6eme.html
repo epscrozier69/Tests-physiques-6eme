@@ -190,7 +190,8 @@ table.data-table td{
   border-bottom:1px solid var(--border);
   background:#fff;
 }
-table.data-table tbody tr:hover td{background:#f8fafc;}
+table.data-table tbody tr:nth-child(even) td{background:#e2e8f0;}
+table.data-table tbody tr:hover td{background:#dbeafe;}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 
 .badge{
@@ -275,6 +276,8 @@ select, input[type=number], input[type=text]{
 
 .pickable-row{cursor:pointer;font-weight:600;}
 .pickable-row:hover{color:var(--primary-dark);text-decoration:underline;}
+.clickable-cell{cursor:pointer;font-weight:600;}
+.clickable-cell:hover{color:var(--primary-dark);text-decoration:underline;}
 
 footer{
   text-align:center;
@@ -380,7 +383,7 @@ function loadFromCloud(){
 let state = {
   classes: {},      // { className: { students:[...], selectedTest:null, leger:{...}, vitesse:{...}, longueur:{...} } }
   classOrder: [],
-  activeTab: 'general' // 'general' | 'results' | className
+  activeTab: null // 'results' | className
 };
 
 let resultsClassFilter = 'all';
@@ -634,9 +637,11 @@ function exportResults(){
 
 /* ==================== RESET ==================== */
 document.getElementById('btnReset').addEventListener('click', ()=>{
-  if(confirm('Cette action supprimera toutes les classes et tous les résultats enregistrés dans ce navigateur. Continuer ?')){
+  if(confirm('Cette action supprimera toutes les classes et tous les résultats enregistrés, sur tous les appareils synchronisés. Continuer ?')){
     localStorage.removeItem(STORAGE_KEY);
-    state = {classes:{}, classOrder:[], activeTab:'general'};
+    state = {classes:{}, classOrder:[], activeTab:null};
+    if(cloudSyncTimer){ clearTimeout(cloudSyncTimer); cloudSyncTimer = null; }
+    cloudDoc.set(state).catch(e=> console.warn('Réinitialisation cloud impossible (hors ligne ?)', e));
     renderAll();
   }
 });
@@ -644,7 +649,7 @@ document.getElementById('btnReset').addEventListener('click', ()=>{
 /* ==================== RENDU : NAVIGATION ==================== */
 function renderTabs(){
   const nav = document.getElementById('tabsNav');
-  let html = `<button data-tab="general" class="${state.activeTab==='general'?'active':''}">🏠 Général</button>`;
+  let html = '';
   state.classOrder.forEach(cn=>{
     html += `<button data-tab="${escapeAttr(cn)}" class="${state.activeTab===cn?'active':''}">🏷️ ${escapeHtml(cn)}</button>`;
   });
@@ -671,45 +676,21 @@ function fullName(s){ return s.nomPrenom; }
 function renderAll(){
   renderTabs();
   const main = document.getElementById('mainContent');
-  if(state.activeTab === 'general') main.innerHTML = renderGeneralTab();
-  else if(state.activeTab === 'results') main.innerHTML = renderResultsTab();
-  else main.innerHTML = renderClassTab(state.activeTab);
-  attachDynamicHandlers();
-}
-
-/* ---- Onglet Général : 5 colonnes ---- */
-function renderGeneralTab(){
-  const students = sortStudentsAlpha(allStudentsFlat());
-  if(!students.length){
-    return `<div class="card"><div class="empty-state">
+  if(state.classOrder.length === 0){
+    main.innerHTML = `<div class="card"><div class="empty-state">
       <span class="big-icon">📋</span>
       <h2>Aucune classe importée</h2>
       <p>En haut de la page, choisissez une <strong>classe</strong> puis cliquez sur <strong>« Importer cette classe »</strong> pour charger le fichier Google Sheet / Excel du collège : seuls les élèves de la classe choisie seront conservés, dans un nouvel onglet.</p>
     </div></div>`;
+  }else if(state.activeTab === 'results'){
+    main.innerHTML = renderResultsTab();
+  }else if(state.classes[state.activeTab]){
+    main.innerHTML = renderClassTab(state.activeTab);
+  }else{
+    state.activeTab = state.classOrder[0];
+    main.innerHTML = renderClassTab(state.activeTab);
   }
-  const cols = ['N°','Nom Prénom','Classe','Sexe','Groupe'];
-  let rows = students.map((s,i)=>`
-    <tr>
-      <td>${i+1}</td>
-      <td>${escapeHtml(fullName(s))}</td>
-      <td>${escapeHtml(s.classe)}</td>
-      <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
-      <td>${s.groupe||'—'}</td>
-    </tr>`).join('');
-  return `
-  <div class="card">
-    <h2>Vue d'ensemble — tous les élèves</h2>
-    <div class="pill-row">
-      <span class="pill">${state.classOrder.length} classe(s)</span>
-      <span class="pill">${students.length} élève(s)</span>
-    </div>
-    <div class="table-wrap">
-      <table class="data-table">
-        <thead><tr>${cols.map((c,i)=>`<th style="background:${HEADER_COLORS[i%HEADER_COLORS.length]}">${c}</th>`).join('')}</tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  </div>`;
+  attachDynamicHandlers();
 }
 
 /* ---- Onglet Classe ---- */
@@ -754,34 +735,7 @@ function renderLegerPanel(className, cls, students){
   const leger = cls.leger;
   const groupA = students.filter(s=>s.groupe==='A');
   const groupB = students.filter(s=>s.groupe==='B');
-
-  const groupColumn = (groupStudents, groupLabel, otherGroupLabel)=> `
-    <h3>Groupe ${groupLabel} <span class="pill" style="margin-left:6px;">${groupStudents.length} élève(s)</span></h3>
-    <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr>
-        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
-        <th style="background:${HEADER_COLORS[2]}">Sexe</th>
-        <th style="background:${HEADER_COLORS[4]}">Absent</th>
-        <th style="background:${HEADER_COLORS[3]}"></th>
-      </tr></thead>
-      <tbody>
-      ${groupStudents.map(s=>`
-        <tr>
-          <td>${escapeHtml(fullName(s))}</td>
-          <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
-          <td><input type="checkbox" class="leger-absent" data-class="${escapeAttr(className)}" data-student="${s.id}" ${s.results.leger && s.results.leger.absent ? 'checked':''} ${leger.running?'disabled':''}></td>
-          <td><button class="small-btn btn-soft group-move-btn" data-class="${escapeAttr(className)}" data-student="${s.id}" data-group="${otherGroupLabel}" ${leger.running?'disabled':''}>→ ${otherGroupLabel}</button></td>
-        </tr>`).join('')}
-      </tbody>
-    </table>
-    </div>`;
-
-  const compoTable = `
-    <div class="grid-2">
-      <div>${groupColumn(groupA, 'A', 'B')}</div>
-      <div>${groupColumn(groupB, 'B', 'A')}</div>
-    </div>`;
+  const legerRanks = buildTestRanking(students, 'leger');
 
   let controls = '';
   if(!leger.running){
@@ -797,12 +751,11 @@ function renderLegerPanel(className, cls, students){
     </div>`;
   }
 
-  let liveZone = '';
+  let timerBox = '';
   if(leger.running || leger.elapsedFrozen>0){
     const elapsed = leger.running ? getLegerElapsed(leger) : leger.elapsedFrozen;
     const seg = getLegerSegment(elapsed);
-
-    liveZone = `
+    timerBox = `
     <div class="timer-box" id="legerTimerBox">
       <div class="time" id="legerTimeDisplay">${fmtMMSS(elapsed)}</div>
       <div class="sub">Groupe actif : ${leger.activeGroup} — Palier ${seg.palier} — ${seg.vitesse.toFixed(1)} km/h</div>
@@ -810,56 +763,7 @@ function renderLegerPanel(className, cls, students){
     <div class="inline-form">
       ${leger.running ? `<button class="btn btn-outline" style="color:#1e293b;background:#e2e8f0;" id="btnStopLeger" data-class="${escapeAttr(className)}">⏸️ Arrêter le test</button>` : ''}
     </div>
-    <h3 style="margin-top:16px;">Groupe actif : ${leger.activeGroup} — cliquer sur "Arrêter" pour un élève de ce groupe</h3>
-    <div class="table-wrap">
-    <table class="data-table">
-      <thead><tr>
-        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
-        <th style="background:${HEADER_COLORS[1]}">Sexe</th>
-        <th style="background:${HEADER_COLORS[2]}">Groupe</th>
-        <th style="background:${HEADER_COLORS[3]}">Performance</th>
-        <th style="background:${HEADER_COLORS[4]}">Niveau</th>
-        <th style="background:${HEADER_COLORS[5]}">Classement sexe</th>
-        <th style="background:${HEADER_COLORS[6]}">Classement général</th>
-        <th style="background:${HEADER_COLORS[7]}">Action</th>
-      </tr></thead>
-      <tbody>
-      ${(()=>{
-        const legerRanks = buildTestRanking(students, 'leger');
-        return students.map(s=>{
-          const r = s.results.leger;
-          let perf, niveau, rangSexe, rangGeneral, action;
-          if(r && r.absent){
-            perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
-            rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>'; action = '';
-          }else if(r && r.done){
-            const niv = niveauLeger(r.palier);
-            perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)}`;
-            niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
-            const rc = rankCells(legerRanks, s);
-            rangSexe = rc.sexe; rangGeneral = rc.general; action = '';
-          }else{
-            perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
-            rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
-            action = s.groupe===leger.activeGroup
-              ? `<button class="btn btn-accent small-btn leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">⏹️ Arrêter</button>`
-              : '<span class="muted">—</span>';
-          }
-          return `<tr>
-            <td>${escapeHtml(fullName(s))}</td>
-            <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
-            <td>${s.groupe}</td>
-            <td>${perf}</td>
-            <td>${niveau}</td>
-            <td>${rangSexe}</td>
-            <td>${rangGeneral}</td>
-            <td>${action}</td>
-          </tr>`;
-        }).join('');
-      })()}
-      </tbody>
-    </table>
-    </div>`;
+    ${leger.running ? `<p class="muted" style="text-align:center;">Cliquez sur le nom d'un élève du groupe ${leger.activeGroup} pour enregistrer son arrêt.</p>` : ''}`;
   }
 
   const groupDone = (g)=> students.filter(s=>s.groupe===g).every(s=> s.results.leger && (s.results.leger.absent || s.results.leger.done));
@@ -871,8 +775,67 @@ function renderLegerPanel(className, cls, students){
     }
   }
 
-  return `${compoTable}
-  <div style="margin-top:18px;">${controls}${nextGroupBtn}${liveZone}</div>`;
+  const rows = students.map(s=>{
+    const r = s.results.leger;
+    const otherGroup = s.groupe==='A' ? 'B' : 'A';
+    let perf, niveau, rangSexe, rangGeneral, nameCell;
+    if(r && r.absent){
+      perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+      nameCell = `<td>${escapeHtml(fullName(s))}</td>`;
+    }else if(r && r.done){
+      const niv = niveauLeger(r.palier);
+      perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)}`;
+      niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
+      const rc = rankCells(legerRanks, s);
+      rangSexe = rc.sexe; rangGeneral = rc.general;
+      nameCell = `<td>${escapeHtml(fullName(s))}</td>`;
+    }else{
+      perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
+      rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
+      nameCell = (leger.running && s.groupe===leger.activeGroup)
+        ? `<td class="clickable-cell leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">⏹️ ${escapeHtml(fullName(s))}</td>`
+        : `<td>${escapeHtml(fullName(s))}</td>`;
+    }
+    const disabled = leger.running ? 'disabled' : '';
+    return `<tr>
+      ${nameCell}
+      <td>${s.sexe==='F'?'Fille':'Garçon'}</td>
+      <td>${s.groupe} <button class="small-btn btn-soft group-move-btn" data-class="${escapeAttr(className)}" data-student="${s.id}" data-group="${otherGroup}" ${disabled}>→ ${otherGroup}</button></td>
+      <td><input type="checkbox" class="leger-absent" data-class="${escapeAttr(className)}" data-student="${s.id}" ${r && r.absent ? 'checked':''} ${disabled}></td>
+      <td>${perf}</td>
+      <td>${niveau}</td>
+      <td>${rangSexe}</td>
+      <td>${rangGeneral}</td>
+    </tr>`;
+  }).join('');
+
+  const table = `
+    <div class="table-wrap">
+    <table class="data-table">
+      <thead><tr>
+        <th style="background:${HEADER_COLORS[0]}">Nom Prénom</th>
+        <th style="background:${HEADER_COLORS[1]}">Sexe</th>
+        <th style="background:${HEADER_COLORS[2]}">Groupe</th>
+        <th style="background:${HEADER_COLORS[3]}">Absent</th>
+        <th style="background:${HEADER_COLORS[4]}">Performance</th>
+        <th style="background:${HEADER_COLORS[5]}">Niveau</th>
+        <th style="background:${HEADER_COLORS[6]}">Classement sexe</th>
+        <th style="background:${HEADER_COLORS[7]}">Classement général</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    </div>`;
+
+  return `
+  <div class="pill-row">
+    <span class="pill">Groupe A : ${groupA.length} élève(s)</span>
+    <span class="pill">Groupe B : ${groupB.length} élève(s)</span>
+  </div>
+  ${controls}
+  ${timerBox}
+  ${nextGroupBtn}
+  ${table}`;
 }
 
 function getLegerElapsed(leger){
@@ -955,7 +918,7 @@ function renderLongueurPanel(className, cls, students){
       <div class="name">${escapeHtml(fullName(current))}</div>
       <div class="progress">${doneCount}/${students.length} élève(s) testé(s)</div>
       <div class="inline-form">
-        <label>Distance (cm) : <input type="number" id="longueurInput" min="0" step="1" style="width:100px;" value="${existingValue}"></label>
+        <label>Distance (cm) : <input type="number" inputmode="numeric" pattern="[0-9]*" id="longueurInput" min="0" step="1" style="width:100px;" value="${existingValue}"></label>
         <button class="btn btn-accent" id="btnValidLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">${isEdit ? '💾 Enregistrer' : '✅ Valider'}</button>
         <button class="btn btn-soft" id="btnAbsentLongueur" data-class="${escapeAttr(className)}" data-student="${current.id}">🚫 Absent</button>
       </div>
@@ -1140,9 +1103,10 @@ function rankCells(rankInfo, s){
   const sxMedal = MEDALS[sx] ? MEDALS[sx]+' ' : '';
   const boldG = MEDALS[g] ? 'font-weight:700;' : '';
   const boldS = MEDALS[sx] ? 'font-weight:700;' : '';
+  const sexLabel = s.sexe==='F' ? 'filles' : 'garçons';
   return {
     general: `<span style="${boldG}">${gMedal}${ordinal(g)}</span>`,
-    sexe: `<span style="${boldS}">${sxMedal}${ordinal(sx)}</span>`
+    sexe: `<span style="${boldS}">${sxMedal}${ordinal(sx)} ${sexLabel}</span>`
   };
 }
 function buildTestRanking(students, testKey){
@@ -1407,7 +1371,6 @@ function recordResult(className, test, studentId, rawValue){
   });
 })();
 loadState();
-if(!state.activeTab) state.activeTab = 'general';
 renderAll();
 loadFromCloud();
 </script>
