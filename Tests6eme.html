@@ -190,6 +190,7 @@ table.data-table td{
   border-bottom:1px solid var(--border);
   background:#fff;
 }
+table.data-table td:first-child{white-space:nowrap;width:1%;}
 table.data-table tbody tr:nth-child(even) td{background:#e2e8f0;}
 table.data-table tbody tr:hover td{background:#dbeafe;}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
@@ -782,27 +783,27 @@ function renderLegerPanel(className, cls, students){
     }
   }
 
-  const rows = students.map(s=>{
+  const rows = students.map((s,i)=>{
     const r = s.results.leger;
     const otherGroup = s.groupe==='A' ? 'B' : 'A';
     let perf, niveau, rangSexe, rangGeneral, nameCell;
     if(r && r.absent){
       perf = '<span class="badge badge-abs">Absent</span>'; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
-      nameCell = `<td>${escapeHtml(fullName(s))}</td>`;
+      nameCell = `<td>${i+1}. ${escapeHtml(fullName(s))}</td>`;
     }else if(r && r.done){
       const niv = niveauLeger(r.palier);
       perf = `Palier ${r.palier} · ${r.vitesse.toFixed(1)} km/h · ${fmtMMSS(r.temps)} ${clearResultBtn(className,'leger',s.id)}`;
       niveau = `<span class="badge badge-${niv}">${LEVEL_LABEL[niv]}</span>`;
       const rc = rankCells(legerRanks, s);
       rangSexe = rc.sexe; rangGeneral = rc.general;
-      nameCell = `<td>${escapeHtml(fullName(s))}</td>`;
+      nameCell = `<td>${i+1}. ${escapeHtml(fullName(s))}</td>`;
     }else{
       perf = '<span class="muted">en attente</span>'; niveau = '<span class="muted">—</span>';
       rangSexe = '<span class="muted">—</span>'; rangGeneral = '<span class="muted">—</span>';
       nameCell = (leger.running && s.groupe===leger.activeGroup)
-        ? `<td class="clickable-cell leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">⏹️ ${escapeHtml(fullName(s))}</td>`
-        : `<td>${escapeHtml(fullName(s))}</td>`;
+        ? `<td class="clickable-cell leger-stop-btn" data-class="${escapeAttr(className)}" data-student="${s.id}">⏹️ ${i+1}. ${escapeHtml(fullName(s))}</td>`
+        : `<td>${i+1}. ${escapeHtml(fullName(s))}</td>`;
     }
     const disabled = leger.running ? 'disabled' : '';
     return `<tr>
@@ -936,7 +937,7 @@ function renderLongueurPanel(className, cls, students){
   }
 
   const longueurRanks = buildTestRanking(students, 'longueur');
-  const rows = students.map(s=>{
+  const rows = students.map((s,i)=>{
     const r = s.results.longueur;
     let perf, niveau, rangSexe, rangGeneral;
     if(!r){
@@ -952,7 +953,7 @@ function renderLongueurPanel(className, cls, students){
       const rc = rankCells(longueurRanks, s);
       rangSexe = rc.sexe; rangGeneral = rc.general;
     }
-    const nameCell = `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="longueur" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`;
+    const nameCell = `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="longueur" data-student="${s.id}">${i+1}. ${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`;
     return `<tr>${nameCell}<td>${s.sexe==='F'?'Fille':'Garçon'}</td><td>${perf}</td><td>${niveau}</td><td>${rangSexe}</td><td>${rangGeneral}</td></tr>`;
   }).join('');
 
@@ -1023,7 +1024,7 @@ function renderVitessePanel(className, cls, students){
   }
 
   const vitesseRanks = buildTestRanking(students, 'vitesse');
-  const rows = students.map(s=>{
+  const rows = students.map((s,i)=>{
     const r = s.results.vitesse;
     let perf, niveau, rangSexe, rangGeneral;
     if(!r){
@@ -1041,8 +1042,8 @@ function renderVitessePanel(className, cls, students){
     }
     const clickable = !vit.running;
     const nameCell = clickable
-      ? `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="vitesse" data-student="${s.id}">${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`
-      : `<td>${escapeHtml(fullName(s))}</td>`;
+      ? `<td class="pickable-row" data-class="${escapeAttr(className)}" data-test="vitesse" data-student="${s.id}">${i+1}. ${escapeHtml(fullName(s))}${current && s.id===current.id?' <span class="pill" style="padding:2px 8px;">en cours</span>':''}</td>`
+      : `<td>${i+1}. ${escapeHtml(fullName(s))}</td>`;
     return `<tr>${nameCell}<td>${s.sexe==='F'?'Fille':'Garçon'}</td><td>${perf}</td><td>${niveau}</td><td>${rangSexe}</td><td>${rangGeneral}</td></tr>`;
   }).join('');
 
